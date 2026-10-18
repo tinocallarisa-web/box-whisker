@@ -144,7 +144,7 @@ def main():
     caps = {
         "dataRoles": roles,
         "dataViewMappings": [{
-            "conditions": [{"category": {"max": 1}, "value": {"max": 1}, "detail": {"max": 1},
+            "conditions": [{"value": {"max": 1}, "detail": {"max": 1},
                             "group": {"max": 1}, "panel": {"max": 1}}],
             "categorical": {
                 "categories": {

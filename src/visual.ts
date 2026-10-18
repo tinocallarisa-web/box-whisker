@@ -185,6 +185,7 @@ export class Visual implements IVisual {
     private hasData = false;
     private missingDetail = false;
     private focusKey = "";
+    private restoredIds: ISelectionId[] = [];
     private keyboardNav = false;
     /** Formato desde el lienzo (on-object): el clic selecciona qué formatear, no filtra datos. */
     public visualOnObjectFormatting: powerbi.extensibility.visual.VisualOnObjectFormatting;
@@ -256,7 +257,8 @@ export class Visual implements IVisual {
             this.selectionManager.showContextMenu({} as ISelectionId, { x: e.clientX, y: e.clientY });
         });
         // Marcadores y selección hecha desde fuera: solo repintar. Nunca persistProperties aquí.
-        this.selectionManager.registerOnSelectCallback(() => this.paintSelection());
+        // Al restaurar un marcador Power BI pasa aquí los IDs; getSelectionIds() puede no tenerlos todavía.
+        this.selectionManager.registerOnSelectCallback((ids: ISelectionId[]) => { this.restoredIds = ids || []; this.paintSelection(); });
     }
 
     public destroy(): void {
@@ -265,7 +267,9 @@ export class Visual implements IVisual {
     }
 
     private get canInteract(): boolean {
-        return (this.host as any).allowInteractions !== false;
+        // hostCapabilities es donde la API 5.x lo pone; host.allowInteractions solo existía en versiones antiguas.
+        const h: any = this.host;
+        return (h.hostCapabilities?.allowInteractions ?? h.allowInteractions) !== false;
     }
 
     // ── Textos ────────────────────────────────────────────────────────────────
@@ -393,7 +397,9 @@ export class Visual implements IVisual {
         this.boxes = []; this.cats = []; this.groups = []; this.panels = [];
         this.missingDetail = false;
         const cats = dv?.categorical?.categories || [];
-        const catCol = cats.find(c => c.source.roles?.["category"]);
+        // Con una jerarquía y "Expandir todo" llegan varias columnas con el rol: la caja es la combinación.
+        const catCols = cats.filter(c => c.source.roles?.["category"]);
+        const catCol = catCols[catCols.length - 1];
         const valCol = (dv?.categorical?.values || ([] as any)).find?.((v: powerbi.DataViewValueColumn) => v.source.roles?.["value"]) as powerbi.DataViewValueColumn | undefined;
         if (!catCol || !valCol) return false;
         const detCol = cats.find(c => c.source.roles?.["detail"]);
@@ -405,14 +411,15 @@ export class Visual implements IVisual {
 
         this.valueName = valCol.source.displayName;
         const culture = (this.host as any).locale;
-        this.valueFormat = valCol.source.format;
+        // Formato nativo de la medida, releído en cada update: así se aplican también las cadenas de formato dinámicas.
+        this.valueFormat = this.formatOf(valCol);
         this.allInt = true;
         // Estadísticos (media, cuartiles interpolados, desviación): con un formato entero, "7,6" saldría "8".
-        const base = this.formatter(valCol.source.format, undefined, culture);
+        const base = this.formatter(this.valueFormat, undefined, culture);
         const plain = (() => { try { return new Intl.NumberFormat(culture, { maximumFractionDigits: 2 }); } catch { return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }); } })();
         this.fmt = (v: number) => {
             const out = base(v);
-            if (Number.isInteger(v) || /%/.test(valCol.source.format || "") || /[.,]\d/.test(out)) return out;
+            if (Number.isInteger(v) || /%/.test(this.valueFormat || "") || /[.,]\d/.test(out)) return out;
             return plain.format(v);
         };
         const s = this.effective();
@@ -427,7 +434,7 @@ export class Visual implements IVisual {
             const v = Number(raw);
             if (!Number.isFinite(v)) continue;
             if (!Number.isInteger(v)) this.allInt = false;
-            const cat = name(catCol.values[i]);
+            const cat = catCols.length > 1 ? catCols.map(c => name(c.values[i])).join(" · ") : name(catCol.values[i]);
             const group = grpCol ? name(grpCol.values[i]) : null;
             const panel = panCol ? name(panCol.values[i]) : null;
             const key = (panel ?? "") + "\u0001" + cat + "\u0001" + (group ?? "");
@@ -444,14 +451,15 @@ export class Visual implements IVisual {
         let seed = 1;
         by.forEach((b, key) => {
             b.vals.sort((x, y) => x - y);
-            let builder = this.host.createSelectionIdBuilder().withCategory(catCol, b.first);
+            let builder = this.host.createSelectionIdBuilder();
+            for (const c of catCols) builder = builder.withCategory(c, b.first);
             if (grpCol) builder = builder.withCategory(grpCol, b.first);
             if (panCol) builder = builder.withCategory(panCol, b.first);
             const fx = (catCol.objects?.[b.first]?.["boxes"]?.["fill"] as any)?.solid?.color ?? null;
             const tips = tipCols.map((tc, k) => {
                 const arr = b.tips[k];
                 const avg = arr.length ? arr.reduce((a, x) => a + x, 0) / arr.length : NaN;
-                return { name: tc.source.displayName, value: Number.isFinite(avg) ? this.formatter(tc.source.format, undefined, culture)(avg) : "" };
+                return { name: tc.source.displayName, value: Number.isFinite(avg) ? this.formatter(this.formatOf(tc), undefined, culture)(avg) : "" };
             });
             this.boxes.push({
                 key, cat: b.cat, group: b.group, panel: b.panel, values: b.vals,
@@ -479,6 +487,10 @@ export class Visual implements IVisual {
             const r = typeof x === "string" ? String(x).localeCompare(String(y), undefined, { numeric: true }) : (x as number) - (y as number);
             return s.descending ? -r : r;
         });
+    }
+
+    private formatOf(col: powerbi.DataViewValueColumn): string | undefined {
+        try { return valueFormatter.getFormatStringByColumn(col.source as any) || col.source.format; } catch { return col.source.format; }
     }
 
     private formatter(format: string | undefined, value?: number, culture?: string): (v: number) => string {
@@ -938,6 +950,7 @@ export class Visual implements IVisual {
     private select(b: Box, multi: boolean): void {
         if (!this.canInteract || !b.id) return;
         const sel = this.selectionManager.getSelectionIds() as ISelectionId[];
+        this.restoredIds = [];
         const same = !multi && sel.length === 1 && (sel[0] as any).equals?.(b.id);
         (same ? this.selectionManager.clear() : this.selectionManager.select(b.id, multi)).then(() => this.paintSelection());
     }
@@ -971,11 +984,14 @@ export class Visual implements IVisual {
     }
 
     private paintSelection(): void {
-        const sel = this.selectionManager.getSelectionIds() as ISelectionId[];
+        const own = this.selectionManager.getSelectionIds() as ISelectionId[];
+        const sel = own.length ? own : this.restoredIds;
         const has = sel.length > 0;
+        // Los IDs de un marcador no siempre son el mismo objeto que los del clic: equals en los dos sentidos e includes.
+        const same = (a: any, b: any) => !!(a?.equals?.(b) || b?.equals?.(a) || a?.includes?.(b, true) || b?.includes?.(a, true));
         this.svg.querySelectorAll<SVGGElement>("g[data-box]").forEach(g => {
             const b = this.boxes.find(x => x.key === g.getAttribute("data-box"));
-            const on = !has || (!!b?.id && sel.some(s => (s as any).equals?.(b.id) || (b.id as any).equals?.(s)));
+            const on = !has || (!!b?.id && sel.some(s => same(s, b.id)));
             g.setAttribute("opacity", on ? "1" : "0.3");
             g.setAttribute("aria-selected", has && on ? "true" : "false");
         });
