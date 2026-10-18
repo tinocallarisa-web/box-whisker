@@ -35,6 +35,15 @@ if (json.visual.guid.endsWith("_test") || json.visual.guid.endsWith("_testfree")
     process.exit(1);
 }
 const suffix = free ? "_testfree" : "_test";
+// Power BI Desktop guarda cada visual por guid + versión: con la misma versión sigue sirviendo el paquete
+// anterior aunque importes uno nuevo. Cada build de prueba lleva su propio último dígito (contador local).
+const CONTADOR = path.join(__dirname, ".tmp", "test-build-counter");
+fs.mkdirSync(path.dirname(CONTADOR), { recursive: true });
+const n = (parseInt(fs.existsSync(CONTADOR) ? fs.readFileSync(CONTADOR, "utf8") : "0", 10) || 0) + 1;
+fs.writeFileSync(CONTADOR, String(n), "utf8");
+const partes = json.visual.version.split(".");
+partes[3] = String(Number(partes[3]) + n);
+json.visual.version = partes.join(".");
 json.visual.guid += suffix;
 json.visual.displayName += free ? " (test free)" : " (test)";
 fs.writeFileSync(PBIVIZ, JSON.stringify(json, null, 2) + "\n", "utf8");
