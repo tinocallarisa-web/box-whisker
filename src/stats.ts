@@ -102,17 +102,18 @@ export function density(sorted: number[], sd: number, q1: number, q3: number, st
 }
 
 /** Marcas del eje: 1, 2, 2.5 o 5 por potencia de diez, unas `count` marcas. */
-export function niceTicks(lo: number, hi: number, count: number): { lo: number; hi: number; ticks: number[] } {
-    if (!isFinite(lo) || !isFinite(hi)) return { lo: 0, hi: 1, ticks: [0, 1] };
+export function niceTicks(lo: number, hi: number, count: number, minStep = 0): { lo: number; hi: number; ticks: number[]; step: number } {
+    if (!isFinite(lo) || !isFinite(hi)) return { lo: 0, hi: 1, ticks: [0, 1], step: 1 };
     if (lo === hi) { const d = Math.abs(lo) || 1; lo -= d / 2; hi += d / 2; }
     const raw = (hi - lo) / Math.max(1, count);
     const p = Math.pow(10, Math.floor(Math.log10(raw)));
     const m = raw / p;
-    const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+    // Con datos enteros (notas de 1 a 10, unidades) no hay marcas en 2,5: el paso mínimo es 1.
+    const step = Math.max(minStep, (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p);
     const a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step;
     const ticks: number[] = [];
     for (let v = a; v <= b + step / 2; v += step) ticks.push(Math.abs(v) < step / 1e6 ? 0 : v);
-    return { lo: a, hi: b, ticks };
+    return { lo: a, hi: b, ticks, step };
 }
 
 /** Pseudoaleatorio con semilla (mulberry32): el jitter no se mueve al repintar. */

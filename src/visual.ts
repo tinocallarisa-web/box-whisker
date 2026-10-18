@@ -176,6 +176,8 @@ export class Visual implements IVisual {
     private groups: string[] = [];
     private panels: string[] = [];
     private valueName = "";
+    private valueFormat: string | undefined;
+    private allInt = true;
     private fmt: (v: number) => string = v => String(v);
     private fmtAxis: (v: number) => string = v => String(v);
     private lastOptions: VisualUpdateOptions | null = null;
@@ -403,7 +405,16 @@ export class Visual implements IVisual {
 
         this.valueName = valCol.source.displayName;
         const culture = (this.host as any).locale;
-        this.fmt = this.formatter(valCol.source.format, undefined, culture);
+        this.valueFormat = valCol.source.format;
+        this.allInt = true;
+        // Estadísticos (media, cuartiles interpolados, desviación): con un formato entero, "7,6" saldría "8".
+        const base = this.formatter(valCol.source.format, undefined, culture);
+        const plain = (() => { try { return new Intl.NumberFormat(culture, { maximumFractionDigits: 2 }); } catch { return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }); } })();
+        this.fmt = (v: number) => {
+            const out = base(v);
+            if (Number.isInteger(v) || /%/.test(valCol.source.format || "") || /[.,]\d/.test(out)) return out;
+            return plain.format(v);
+        };
         const s = this.effective();
         const method = s.method as QuartileMethod, rule = s.whiskerRule as WhiskerRule;
 
@@ -415,6 +426,7 @@ export class Visual implements IVisual {
             if (raw === null || raw === undefined || raw === "") continue;
             const v = Number(raw);
             if (!Number.isFinite(v)) continue;
+            if (!Number.isInteger(v)) this.allInt = false;
             const cat = name(catCol.values[i]);
             const group = grpCol ? name(grpCol.values[i]) : null;
             const panel = panCol ? name(panCol.values[i]) : null;
@@ -563,8 +575,20 @@ export class Visual implements IVisual {
         if (s.ref2) { lo = Math.min(lo, s.ref2Value); hi = Math.max(hi, s.ref2Value); }
         if (!s.vAuto && Number.isFinite(s.vMin) && Number.isFinite(s.vMax) && s.vMax > s.vMin) { lo = s.vMin; hi = s.vMax; }
         const valueLen = vertical ? H : W;
-        const nice = s.vAuto ? niceTicks(lo, hi, Math.max(2, Math.floor(valueLen / 70))) : { lo, hi, ticks: niceTicks(lo, hi, Math.max(2, Math.floor(valueLen / 70))).ticks.filter(t => t >= lo && t <= hi) };
-        this.fmtAxis = this.formatter(this.lastDv?.categorical?.values?.[0]?.source?.format, Math.max(Math.abs(nice.lo), Math.abs(nice.hi)), (this.host as any).locale);
+        const count = Math.max(2, Math.floor(valueLen / 70));
+        const minStep = this.allInt ? 1 : 0;
+        const nt = niceTicks(lo, hi, count, minStep);
+        const nice = s.vAuto ? nt : { lo, hi, ticks: nt.ticks.filter(t => t >= lo && t <= hi), step: nt.step };
+        const culture = (this.host as any).locale;
+        const axisBase = this.formatter(this.valueFormat, Math.max(Math.abs(nice.lo), Math.abs(nice.hi)), culture);
+        // Si el formato de la medida repite etiquetas (paso 0,5 con formato entero), decimales según el paso.
+        const labels = nice.ticks.map(t => axisBase(t));
+        if (new Set(labels).size < labels.length) {
+            const dec = Math.min(4, Math.max(0, -Math.floor(Math.log10(nice.step) + 1e-9)) + (nice.step / Math.pow(10, Math.floor(Math.log10(nice.step))) === 2.5 ? 1 : 0));
+            let nf: Intl.NumberFormat;
+            try { nf = new Intl.NumberFormat(culture, { minimumFractionDigits: dec, maximumFractionDigits: dec }); } catch { nf = new Intl.NumberFormat(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+            this.fmtAxis = (v: number) => nf.format(v);
+        } else this.fmtAxis = axisBase;
 
         // Márgenes según orientación
         const tickW = showV ? Math.max(...nice.ticks.map(t => this.fmtAxis(t).length)) * fontV * 0.6 + 8 : 0;
@@ -760,9 +784,9 @@ export class Visual implements IVisual {
         const notchInset = s.notches ? bw * 0.22 : 0;
         line(P(u0 + notchInset, medp), P(u1 - notchInset, medp), mc, 2.5);
         if (s.medianLabel && bw > 14) {
-            const [x, y] = P(u1 + 3, medp);
-            const t = this.el("text", { x, y: vertical ? y + 3.5 : y - 4, "font-size": Math.max(8, s.cFont - 1), fill: hc.on ? hc.fg : s.medianColor, "text-anchor": vertical ? "start" : "middle" }, g);
-            if (!vertical) { t.setAttribute("x", String(x - (u1 - u0) / 2 - 3)); t.setAttribute("y", String(y - (u1 - u0) / 2 - 4)); }
+            // Vertical: a la derecha de la caja. Horizontal: encima de la caja, sobre la mediana.
+            const [x, y] = vertical ? P(u1 + 3, medp) : P(u0 - 4, medp);
+            const t = this.el("text", { x, y: vertical ? y + 3.5 : y, "font-size": Math.max(8, s.cFont - 1), fill: hc.on ? hc.fg : s.medianColor, "text-anchor": vertical ? "start" : "middle" }, g);
             t.textContent = this.fmt(st.median);
         }
         // Media (Pro): rombo
