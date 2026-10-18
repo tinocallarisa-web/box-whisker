@@ -97,11 +97,15 @@ OBJECTS = [
         ("max", "Maximum", "num"),
         ("fontSize", "Text size", "num"),
         ("color", "Text color", "color"),
+        ("fontFamily", "Font", "text"),
+        ("bold", "Bold", "bool"),
     ]),
     ("categoryAxis", "Category axis", [
         ("show", "Show", "bool"),
         ("fontSize", "Text size", "num"),
         ("color", "Text color", "color"),
+        ("fontFamily", "Font", "text"),
+        ("bold", "Bold", "bool"),
     ]),
     ("legend", "Legend", [
         ("show", "Show", "bool"),

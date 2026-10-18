@@ -60,8 +60,8 @@ interface Settings {
     sortBy: string; descending: boolean;
     ref1: boolean; ref1Value: number; ref1Label: string; refColor: string; ref2: boolean; ref2Value: number; ref2Label: string;
     vAxis: boolean; vTitle: boolean; vTitleText: string; grid: boolean; vAuto: boolean; vMin: number; vMax: number;
-    vFont: number; vColor: string;
-    cAxis: boolean; cFont: number; cColor: string;
+    vFont: number; vColor: string; vFamily: string; vBold: boolean;
+    cAxis: boolean; cFont: number; cColor: string; cFamily: string; cBold: boolean;
     legend: boolean; legendPos: string; legendFont: number; legendColor: string;
     table: boolean; tableFont: number; tableColor: string;
     background: string;
@@ -78,8 +78,8 @@ const DEFAULTS: Settings = {
     violin: false, violinOpacity: 18, violinColor: "",
     sortBy: "data", descending: false,
     ref1: false, ref1Value: 0, ref1Label: "", refColor: "#B4541C", ref2: false, ref2Value: 0, ref2Label: "",
-    vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C",
-    cAxis: true, cFont: 11, cColor: "#605E5C",
+    vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C", vFamily: "", vBold: false,
+    cAxis: true, cFont: 11, cColor: "#605E5C", cFamily: "", cBold: false,
     legend: true, legendPos: "top", legendFont: 11, legendColor: "#605E5C",
     table: false, tableFont: 11, tableColor: "#3D3929",
     background: "",
@@ -133,7 +133,9 @@ function readSettings(objects: Objects): Settings {
         vAxis: pick("valueAxis", "show", "vAxis"), vTitle: pick("valueAxis", "title", "vTitle"), vTitleText: pick("valueAxis", "titleText", "vTitleText"),
         grid: pick("valueAxis", "gridlines", "grid"), vAuto: pick("valueAxis", "auto", "vAuto"), vMin: pick("valueAxis", "min", "vMin"),
         vMax: pick("valueAxis", "max", "vMax"), vFont: pick("valueAxis", "fontSize", "vFont"), vColor: pick("valueAxis", "color", "vColor"),
+        vFamily: pick("valueAxis", "fontFamily", "vFamily"), vBold: pick("valueAxis", "bold", "vBold"),
         cAxis: pick("categoryAxis", "show", "cAxis"), cFont: pick("categoryAxis", "fontSize", "cFont"), cColor: pick("categoryAxis", "color", "cColor"),
+        cFamily: pick("categoryAxis", "fontFamily", "cFamily"), cBold: pick("categoryAxis", "bold", "cBold"),
         legend: pick("legend", "show", "legend"), legendPos: pick("legend", "position", "legendPos"),
         legendFont: pick("legend", "fontSize", "legendFont"), legendColor: pick("legend", "color", "legendColor"),
         table: pick("statsTable", "show", "table"), tableFont: pick("statsTable", "fontSize", "tableFont"),
@@ -644,7 +646,8 @@ export class Visual implements IVisual {
             const P = (u: number, v: number): [number, number] => vertical ? [u, v] : [v, u];
 
             // Rejilla y eje de valores
-            const axis = this.el("g", { class: "tcbw-vaxis" }, g);
+            const axis = this.el("g", { class: "tcbw-vaxis", "font-weight": s.vBold ? 700 : 400 }, g);
+            if (s.vFamily) axis.setAttribute("font-family", s.vFamily);
             this.subSelectable(axis, "valueAxis", this.t("Obj_valueAxis", "Value axis"), powerbi.visuals.SubSelectionStylesType.Text);
             for (const tv of nice.ticks) {
                 const p = vPix(tv);
@@ -682,7 +685,8 @@ export class Visual implements IVisual {
             }
 
             // Etiquetas de categoría y n
-            const caxis = this.el("g", { class: "tcbw-caxis" }, g);
+            const caxis = this.el("g", { class: "tcbw-caxis", "font-weight": s.cBold ? 700 : 400 }, g);
+            if (s.cFamily) caxis.setAttribute("font-family", s.cFamily);
             this.subSelectable(caxis, "categoryAxis", this.t("Obj_categoryAxis", "Category axis"), powerbi.visuals.SubSelectionStylesType.Text);
             this.cats.forEach((cat, ci) => {
                 if (!showC) return;
@@ -1224,10 +1228,14 @@ export class Visual implements IVisual {
                     stroke: ref("boxes", "border", this.t("Prop_boxes_border", "Border color")) } as any;
             case "valueAxis":
                 return { type: powerbi.visuals.SubSelectionStylesType.Text,
+                    fontFamily: ref("valueAxis", "fontFamily", this.t("Prop_valueAxis_fontFamily", "Font")),
+                    bold: ref("valueAxis", "bold", this.t("Prop_valueAxis_bold", "Bold")),
                     fontSize: ref("valueAxis", "fontSize", this.t("Prop_valueAxis_fontSize", "Text size")),
                     fontColor: ref("valueAxis", "color", this.t("Prop_valueAxis_color", "Text color")) } as any;
             case "categoryAxis":
                 return { type: powerbi.visuals.SubSelectionStylesType.Text,
+                    fontFamily: ref("categoryAxis", "fontFamily", this.t("Prop_categoryAxis_fontFamily", "Font")),
+                    bold: ref("categoryAxis", "bold", this.t("Prop_categoryAxis_bold", "Bold")),
                     fontSize: ref("categoryAxis", "fontSize", this.t("Prop_categoryAxis_fontSize", "Text size")),
                     fontColor: ref("categoryAxis", "color", this.t("Prop_categoryAxis_color", "Text color")) } as any;
             case "legend":
@@ -1292,6 +1300,7 @@ export class Visual implements IVisual {
         const name = (obj: string, prop: string, fb: string) => T(`Prop_${obj}_${prop}`, fb);
         const num = (obj: string, prop: string, fb: string, v: number) => ({ uid: `${obj}_${prop}`, displayName: name(obj, prop, fb), control: { type: powerbi.visuals.FormattingComponent.NumUpDown, properties: { descriptor: d(obj, prop), value: v } } });
         const tog = (obj: string, prop: string, fb: string, v: boolean) => ({ uid: `${obj}_${prop}`, displayName: name(obj, prop, fb), control: { type: powerbi.visuals.FormattingComponent.ToggleSwitch, properties: { descriptor: d(obj, prop), value: v } } });
+        const font = (obj: string, prop: string, fb: string, v: string) => ({ uid: `${obj}_${prop}`, displayName: name(obj, prop, fb), control: { type: powerbi.visuals.FormattingComponent.FontPicker, properties: { descriptor: d(obj, prop), value: v || "Segoe UI" } } });
         const txt = (obj: string, prop: string, fb: string, v: string) => ({ uid: `${obj}_${prop}`, displayName: name(obj, prop, fb), control: { type: powerbi.visuals.FormattingComponent.TextInput, properties: { descriptor: d(obj, prop), value: v, placeholder: "" } } });
         const col = (obj: string, prop: string, fb: string, v: string, cf = false) => ({
             uid: `${obj}_${prop}`, displayName: name(obj, prop, fb),
@@ -1383,11 +1392,15 @@ export class Visual implements IVisual {
                 num("valueAxis", "max", "Maximum", s.vMax),
                 num("valueAxis", "fontSize", "Text size", s.vFont),
                 col("valueAxis", "color", "Text color", s.vColor),
+                font("valueAxis", "fontFamily", "Font", s.vFamily),
+                tog("valueAxis", "bold", "Bold", s.vBold),
             ]),
             card("categoryAxis", "Category axis", [
                 tog("categoryAxis", "show", "Show", s.cAxis),
                 num("categoryAxis", "fontSize", "Text size", s.cFont),
                 col("categoryAxis", "color", "Text color", s.cColor),
+                font("categoryAxis", "fontFamily", "Font", s.cFamily),
+                tog("categoryAxis", "bold", "Bold", s.cBold),
             ]),
             card("legend", "Legend", [
                 tog("legend", "show", "Show", s.legend),

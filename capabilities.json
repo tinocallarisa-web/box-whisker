@@ -680,6 +680,20 @@
               }
             }
           }
+        },
+        "fontFamily": {
+          "displayName": "Font",
+          "displayNameKey": "Prop_valueAxis_fontFamily",
+          "type": {
+            "text": true
+          }
+        },
+        "bold": {
+          "displayName": "Bold",
+          "displayNameKey": "Prop_valueAxis_bold",
+          "type": {
+            "bool": true
+          }
         }
       }
     },
@@ -710,6 +724,20 @@
                 "color": true
               }
             }
+          }
+        },
+        "fontFamily": {
+          "displayName": "Font",
+          "displayNameKey": "Prop_categoryAxis_fontFamily",
+          "type": {
+            "text": true
+          }
+        },
+        "bold": {
+          "displayName": "Bold",
+          "displayNameKey": "Prop_categoryAxis_bold",
+          "type": {
+            "bool": true
           }
         }
       }

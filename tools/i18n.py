@@ -85,6 +85,8 @@ T = {
 "Second value": ["Segundo valor", "Segundo valor", "Deuxième valeur", "Zweiter Wert", "Secondo valore", "Tweede waarde", "Druga wartość", "2 つ目の値", "第二个值", "두 번째 값"],
 "Second label": ["Segunda etiqueta", "Segundo rótulo", "Deuxième étiquette", "Zweite Beschriftung", "Seconda etichetta", "Tweede label", "Druga etykieta", "2 つ目のラベル", "第二个标签", "두 번째 레이블"],
 "Show": ["Mostrar", "Mostrar", "Afficher", "Anzeigen", "Mostra", "Tonen", "Pokaż", "表示", "显示", "표시"],
+"Font": ["Fuente", "Fonte", "Police", "Schriftart", "Carattere", "Lettertype", "Czcionka", "フォント", "字体", "글꼴"],
+"Bold": ["Negrita", "Negrito", "Gras", "Fett", "Grassetto", "Vet", "Pogrubienie", "太字", "加粗", "굵게"],
 "Title": ["Título", "Título", "Titre", "Titel", "Titolo", "Titel", "Tytuł", "タイトル", "标题", "제목"],
 "Title text": ["Texto del título", "Texto do título", "Texte du titre", "Titeltext", "Testo del titolo", "Titeltekst", "Tekst tytułu", "タイトルのテキスト", "标题文本", "제목 텍스트"],
 "Gridlines": ["Líneas de cuadrícula", "Linhas de grade", "Quadrillage", "Gitternetzlinien", "Griglia", "Rasterlijnen", "Linie siatki", "グリッド線", "网格线", "눈금선"],
