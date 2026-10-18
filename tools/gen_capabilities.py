@@ -70,6 +70,7 @@ OBJECTS = [
     ("violin", "Violin", [
         ("show", "Show violin (Pro)", "bool"),
         ("opacity", "Violin opacity %", "num"),
+        ("color", "Violin color", "color"),
     ]),
     ("sort", "Sort", [
         ("by", "Sort boxes by", E(("data", "Enum_s_data", "Data order"), ("name", "Enum_s_name", "Name"),

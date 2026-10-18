@@ -63,6 +63,7 @@
   "Obj_violin": "Skrzypce",
   "Prop_violin_show": "Pokaż skrzypce (Pro)",
   "Prop_violin_opacity": "Krycie skrzypiec %",
+  "Prop_violin_color": "Kolor skrzypiec",
   "Obj_sort": "Sortuj",
   "Prop_sort_by": "Sortuj pudełka według",
   "Enum_s_data": "Kolejność danych",

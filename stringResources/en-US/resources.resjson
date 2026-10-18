@@ -63,6 +63,7 @@
   "Obj_violin": "Violin",
   "Prop_violin_show": "Show violin (Pro)",
   "Prop_violin_opacity": "Violin opacity %",
+  "Prop_violin_color": "Violin color",
   "Obj_sort": "Sort",
   "Prop_sort_by": "Sort boxes by",
   "Enum_s_data": "Data order",

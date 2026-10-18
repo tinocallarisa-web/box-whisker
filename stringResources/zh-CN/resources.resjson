@@ -63,6 +63,7 @@
   "Obj_violin": "小提琴图",
   "Prop_violin_show": "显示小提琴图 (Pro)",
   "Prop_violin_opacity": "小提琴图不透明度 %",
+  "Prop_violin_color": "小提琴图颜色",
   "Obj_sort": "排序",
   "Prop_sort_by": "箱体排序依据",
   "Enum_s_data": "数据顺序",

@@ -63,6 +63,7 @@
   "Obj_violin": "바이올린",
   "Prop_violin_show": "바이올린 표시(Pro)",
   "Prop_violin_opacity": "바이올린 불투명도 %",
+  "Prop_violin_color": "바이올린 색",
   "Obj_sort": "정렬",
   "Prop_sort_by": "상자 정렬 기준",
   "Enum_s_data": "데이터 순서",

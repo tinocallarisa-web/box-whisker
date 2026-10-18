@@ -56,7 +56,7 @@ interface Settings {
     method: string; showN: boolean; medianLabel: boolean; showMean: boolean; meanColor: string; notches: boolean;
     points: boolean; jitter: number; pointSize: number; pointColor: string; pointBorderColor: string; pointBorderWidth: number;
     pointOpacity: number; outlierSize: number; outlierColor: string;
-    violin: boolean; violinOpacity: number;
+    violin: boolean; violinOpacity: number; violinColor: string;
     sortBy: string; descending: boolean;
     ref1: boolean; ref1Value: number; ref1Label: string; refColor: string; ref2: boolean; ref2Value: number; ref2Label: string;
     vAxis: boolean; vTitle: boolean; vTitleText: string; grid: boolean; vAuto: boolean; vMin: number; vMax: number;
@@ -75,7 +75,7 @@ const DEFAULTS: Settings = {
     method: "linear", showN: true, medianLabel: false, showMean: false, meanColor: "#3E9C5B", notches: false,
     points: false, jitter: 60, pointSize: 2.5, pointColor: "#3D3929", pointBorderColor: "#FFFFFF", pointBorderWidth: 0,
     pointOpacity: 45, outlierSize: 3, outlierColor: "#B4541C",
-    violin: false, violinOpacity: 18,
+    violin: false, violinOpacity: 18, violinColor: "",
     sortBy: "data", descending: false,
     ref1: false, ref1Value: 0, ref1Label: "", refColor: "#B4541C", ref2: false, ref2Value: 0, ref2Label: "",
     vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C",
@@ -125,7 +125,7 @@ function readSettings(objects: Objects): Settings {
         pointColor: pick("points", "color", "pointColor"), pointBorderColor: pick("points", "borderColor", "pointBorderColor"),
         pointBorderWidth: pick("points", "borderWidth", "pointBorderWidth"), pointOpacity: pick("points", "opacity", "pointOpacity"),
         outlierSize: pick("points", "outlierSize", "outlierSize"), outlierColor: pick("points", "outlierColor", "outlierColor"),
-        violin: pick("violin", "show", "violin"), violinOpacity: pick("violin", "opacity", "violinOpacity"),
+        violin: pick("violin", "show", "violin"), violinOpacity: pick("violin", "opacity", "violinOpacity"), violinColor: pick("violin", "color", "violinColor"),
         sortBy: pick("sort", "by", "sortBy"), descending: pick("sort", "descending", "descending"),
         ref1: pick("reference", "show", "ref1"), ref1Value: pick("reference", "value", "ref1Value"), ref1Label: pick("reference", "label", "ref1Label"),
         refColor: pick("reference", "color", "refColor"), ref2: pick("reference", "show2", "ref2"), ref2Value: pick("reference", "value2", "ref2Value"),
@@ -743,6 +743,8 @@ export class Visual implements IVisual {
 
         // Violín (Pro): detrás de la caja
         if (s.violin && st.n >= 3) {
+            // Vacío = el color de la caja o del grupo (con grupos, cada violín conserva el suyo).
+            const vColor = hc.on ? hc.fg : (s.violinColor || baseColor);
             const dens = density(b.values, st.sd, st.q1, st.q3, 48, this.allInt ? 0.6 : 0);
             const maxD = Math.max(...dens.map(d => d.d)) || 1;
             const half = sub * 0.45;
@@ -750,7 +752,7 @@ export class Visual implements IVisual {
             const pts = side(1).concat(side(-1).reverse());
             if (pts.length) {
                 const path = "M" + pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L") + "Z";
-                this.el("path", { d: path, fill: hc.on ? "none" : baseColor, "fill-opacity": clamp(s.violinOpacity, 0, 100) / 100, stroke: hc.on ? hc.fg : baseColor, "stroke-width": 1, "stroke-opacity": 0.6 }, g);
+                this.el("path", { d: path, fill: hc.on ? "none" : vColor, "fill-opacity": clamp(s.violinOpacity, 0, 100) / 100, stroke: vColor, "stroke-width": 1, "stroke-opacity": 0.6 }, g);
             }
         }
 
@@ -1355,6 +1357,7 @@ export class Visual implements IVisual {
             card("violin", "Violin", [
                 tog("violin", "show", "Show violin (Pro)", s.violin),
                 num("violin", "opacity", "Violin opacity %", s.violinOpacity),
+                col("violin", "color", "Violin color", s.violinColor),
             ]),
             card("sort", "Sort", [
                 dd("sort", "by", "Sort boxes by", s.sortBy, [["data", "Enum_s_data", "Data order"], ["name", "Enum_s_name", "Name"],

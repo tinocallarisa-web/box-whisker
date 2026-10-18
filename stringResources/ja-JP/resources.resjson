@@ -63,6 +63,7 @@
   "Obj_violin": "バイオリン",
   "Prop_violin_show": "バイオリンを表示 (Pro)",
   "Prop_violin_opacity": "バイオリンの不透明度 %",
+  "Prop_violin_color": "バイオリンの色",
   "Obj_sort": "並べ替え",
   "Prop_sort_by": "箱の並べ替え",
   "Enum_s_data": "データの順序",

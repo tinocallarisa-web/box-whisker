@@ -63,6 +63,7 @@
   "Obj_violin": "Viool",
   "Prop_violin_show": "Viool tonen (Pro)",
   "Prop_violin_opacity": "Dekking viool %",
+  "Prop_violin_color": "Kleur viool",
   "Obj_sort": "Sorteren",
   "Prop_sort_by": "Boxen sorteren op",
   "Enum_s_data": "Volgorde van gegevens",

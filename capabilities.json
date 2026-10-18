@@ -486,6 +486,17 @@
           "type": {
             "numeric": true
           }
+        },
+        "color": {
+          "displayName": "Violin color",
+          "displayNameKey": "Prop_violin_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
         }
       }
     },

@@ -63,6 +63,7 @@
   "Obj_violin": "Violino",
   "Prop_violin_show": "Mostra violino (Pro)",
   "Prop_violin_opacity": "Opacità violino %",
+  "Prop_violin_color": "Colore del violino",
   "Obj_sort": "Ordina",
   "Prop_sort_by": "Ordina scatole per",
   "Enum_s_data": "Ordine dei dati",

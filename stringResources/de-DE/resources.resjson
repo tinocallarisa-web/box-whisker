@@ -63,6 +63,7 @@
   "Obj_violin": "Violine",
   "Prop_violin_show": "Violine anzeigen (Pro)",
   "Prop_violin_opacity": "Violinen-Deckkraft %",
+  "Prop_violin_color": "Violinenfarbe",
   "Obj_sort": "Sortieren",
   "Prop_sort_by": "Kästen sortieren nach",
   "Enum_s_data": "Datenreihenfolge",

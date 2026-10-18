@@ -74,6 +74,7 @@ T = {
 "Outlier size": ["Tamaño de los valores atípicos", "Tamanho dos valores discrepantes", "Taille des valeurs aberrantes", "Größe der Ausreißer", "Dimensione valori anomali", "Grootte uitschieters", "Rozmiar wartości odstających", "外れ値のサイズ", "离群值大小", "이상값 크기"],
 "Outlier color": ["Color de los valores atípicos", "Cor dos valores discrepantes", "Couleur des valeurs aberrantes", "Farbe der Ausreißer", "Colore valori anomali", "Kleur uitschieters", "Kolor wartości odstających", "外れ値の色", "离群值颜色", "이상값 색"],
 "Show violin (Pro)": ["Mostrar violín (Pro)", "Mostrar violino (Pro)", "Afficher le violon (Pro)", "Violine anzeigen (Pro)", "Mostra violino (Pro)", "Viool tonen (Pro)", "Pokaż skrzypce (Pro)", "バイオリンを表示 (Pro)", "显示小提琴图 (Pro)", "바이올린 표시(Pro)"],
+"Violin color": ["Color del violín", "Cor do violino", "Couleur du violon", "Violinenfarbe", "Colore del violino", "Kleur viool", "Kolor skrzypiec", "バイオリンの色", "小提琴图颜色", "바이올린 색"],
 "Violin opacity %": ["Opacidad del violín %", "Opacidade do violino %", "Opacité du violon %", "Violinen-Deckkraft %", "Opacità violino %", "Dekking viool %", "Krycie skrzypiec %", "バイオリンの不透明度 %", "小提琴图不透明度 %", "바이올린 불투명도 %"],
 "Sort boxes by": ["Ordenar cajas por", "Classificar caixas por", "Trier les boîtes par", "Kästen sortieren nach", "Ordina scatole per", "Boxen sorteren op", "Sortuj pudełka według", "箱の並べ替え", "箱体排序依据", "상자 정렬 기준"],
 "Descending": ["Descendente", "Decrescente", "Décroissant", "Absteigend", "Decrescente", "Aflopend", "Malejąco", "降順", "降序", "내림차순"],
