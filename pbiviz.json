@@ -1,0 +1,41 @@
+{
+  "visual": {
+    "name": "boxWhiskerTCViz",
+    "displayName": "Box & Whisker by TCViz",
+    "guid": "boxWhiskerTCViz2CE5A430433541F1A1D3467185EBA171",
+    "visualClassName": "Visual",
+    "version": "1.0.0.0",
+    "description": "A box plot that reads well: quartiles, whiskers and outliers per category, n on every box, documented quartile method. Pro adds points with jitter, mean and notches, violin, groups and small multiples, reference lines and sorting by median.",
+    "supportUrl": "https://tinocallarisa-web.github.io/box-whisker/support.html",
+    "privacyTermsLink": "https://tinocallarisa-web.github.io/box-whisker/privacy.html",
+    "gitHubUrl": "https://github.com/tinocallarisa-web/box-whisker"
+  },
+  "author": {
+    "name": "TCViz",
+    "email": "support@tcviz.com"
+  },
+  "apiVersion": "5.11.1",
+  "assets": {
+    "icon": "assets/icon.png"
+  },
+  "externalJS": [],
+  "stringResources": [
+    "stringResources/en-US/resources.resjson",
+    "stringResources/es-ES/resources.resjson",
+    "stringResources/fr-FR/resources.resjson",
+    "stringResources/de-DE/resources.resjson",
+    "stringResources/it-IT/resources.resjson",
+    "stringResources/pt-BR/resources.resjson",
+    "stringResources/nl-NL/resources.resjson",
+    "stringResources/pl-PL/resources.resjson",
+    "stringResources/ja-JP/resources.resjson",
+    "stringResources/zh-CN/resources.resjson",
+    "stringResources/ko-KR/resources.resjson",
+    "stringResources/pt-PT/resources.resjson"
+  ],
+  "style": "style/visual.less",
+  "capabilities": "capabilities.json",
+  "privacyTerms": {
+    "link": "https://tinocallarisa-web.github.io/box-whisker/privacy.html"
+  }
+}

@@ -1,0 +1,800 @@
+{
+  "dataRoles": [
+    {
+      "name": "category",
+      "kind": "Grouping",
+      "displayName": "Category",
+      "displayNameKey": "Role_category",
+      "description": "One box per value. A hierarchy gives drilldown.",
+      "descriptionKey": "Role_category_Desc"
+    },
+    {
+      "name": "value",
+      "kind": "Measure",
+      "displayName": "Value",
+      "displayNameKey": "Role_value",
+      "description": "The measure whose distribution is drawn, evaluated per Detail row.",
+      "descriptionKey": "Role_value_Desc"
+    },
+    {
+      "name": "detail",
+      "kind": "Grouping",
+      "displayName": "Detail (rows)",
+      "displayNameKey": "Role_detail",
+      "description": "The ID of each observation: order, employee, ticket. Without it there is no distribution.",
+      "descriptionKey": "Role_detail_Desc"
+    },
+    {
+      "name": "group",
+      "kind": "Grouping",
+      "displayName": "Group (Pro)",
+      "displayNameKey": "Role_group",
+      "description": "Side-by-side boxes within each category, with a legend.",
+      "descriptionKey": "Role_group_Desc"
+    },
+    {
+      "name": "panel",
+      "kind": "Grouping",
+      "displayName": "Small multiples (Pro)",
+      "displayNameKey": "Role_panel",
+      "description": "One panel per value, on a shared scale.",
+      "descriptionKey": "Role_panel_Desc"
+    },
+    {
+      "name": "tooltips",
+      "kind": "Measure",
+      "displayName": "Tooltips",
+      "displayNameKey": "Role_tooltips",
+      "description": "Extra values in the tooltip.",
+      "descriptionKey": "Role_tooltips_Desc"
+    }
+  ],
+  "dataViewMappings": [
+    {
+      "conditions": [
+        {
+          "category": {
+            "max": 1
+          },
+          "value": {
+            "max": 1
+          },
+          "detail": {
+            "max": 1
+          },
+          "group": {
+            "max": 1
+          },
+          "panel": {
+            "max": 1
+          }
+        }
+      ],
+      "categorical": {
+        "categories": {
+          "select": [
+            {
+              "bind": {
+                "to": "category"
+              }
+            },
+            {
+              "bind": {
+                "to": "group"
+              }
+            },
+            {
+              "bind": {
+                "to": "panel"
+              }
+            },
+            {
+              "bind": {
+                "to": "detail"
+              }
+            }
+          ],
+          "dataReductionAlgorithm": {
+            "window": {
+              "count": 30000
+            }
+          }
+        },
+        "values": {
+          "select": [
+            {
+              "bind": {
+                "to": "value"
+              }
+            },
+            {
+              "bind": {
+                "to": "tooltips"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "objects": {
+    "style": {
+      "displayName": "Style template",
+      "displayNameKey": "Obj_style",
+      "properties": {
+        "template": {
+          "displayName": "Template",
+          "displayNameKey": "Prop_style_template",
+          "type": {
+            "enumeration": [
+              {
+                "value": "clean",
+                "displayName": "Clean",
+                "displayNameKey": "Enum_tpl_clean"
+              },
+              {
+                "value": "classic",
+                "displayName": "Classic",
+                "displayNameKey": "Enum_tpl_classic"
+              },
+              {
+                "value": "minimal",
+                "displayName": "Minimal",
+                "displayNameKey": "Enum_tpl_minimal"
+              },
+              {
+                "value": "contrast",
+                "displayName": "Contrast",
+                "displayNameKey": "Enum_tpl_contrast"
+              },
+              {
+                "value": "compact",
+                "displayName": "Compact",
+                "displayNameKey": "Enum_tpl_compact"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "boxes": {
+      "displayName": "Boxes",
+      "displayNameKey": "Obj_boxes",
+      "properties": {
+        "orientation": {
+          "displayName": "Orientation",
+          "displayNameKey": "Prop_boxes_orientation",
+          "type": {
+            "enumeration": [
+              {
+                "value": "vertical",
+                "displayName": "Vertical",
+                "displayNameKey": "Enum_or_vertical"
+              },
+              {
+                "value": "horizontal",
+                "displayName": "Horizontal",
+                "displayNameKey": "Enum_or_horizontal"
+              }
+            ]
+          }
+        },
+        "fill": {
+          "displayName": "Box color",
+          "displayNameKey": "Prop_boxes_fill",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "border": {
+          "displayName": "Border color",
+          "displayNameKey": "Prop_boxes_border",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "borderWidth": {
+          "displayName": "Border width",
+          "displayNameKey": "Prop_boxes_borderWidth",
+          "type": {
+            "numeric": true
+          }
+        },
+        "width": {
+          "displayName": "Box width %",
+          "displayNameKey": "Prop_boxes_width",
+          "type": {
+            "numeric": true
+          }
+        },
+        "radius": {
+          "displayName": "Rounded corners",
+          "displayNameKey": "Prop_boxes_radius",
+          "type": {
+            "numeric": true
+          }
+        },
+        "opacity": {
+          "displayName": "Fill opacity %",
+          "displayNameKey": "Prop_boxes_opacity",
+          "type": {
+            "numeric": true
+          }
+        },
+        "quartileColors": {
+          "displayName": "Color by quartile (Pro)",
+          "displayNameKey": "Prop_boxes_quartileColors",
+          "type": {
+            "bool": true
+          }
+        },
+        "lowerColor": {
+          "displayName": "Lower half color",
+          "displayNameKey": "Prop_boxes_lowerColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "upperColor": {
+          "displayName": "Upper half color",
+          "displayNameKey": "Prop_boxes_upperColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "medianColor": {
+          "displayName": "Median line color",
+          "displayNameKey": "Prop_boxes_medianColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "whiskers": {
+      "displayName": "Whiskers",
+      "displayNameKey": "Obj_whiskers",
+      "properties": {
+        "rule": {
+          "displayName": "Whiskers reach",
+          "displayNameKey": "Prop_whiskers_rule",
+          "type": {
+            "enumeration": [
+              {
+                "value": "tukey",
+                "displayName": "1.5 × IQR (Tukey)",
+                "displayNameKey": "Enum_wh_tukey"
+              },
+              {
+                "value": "minmax",
+                "displayName": "Minimum to maximum",
+                "displayNameKey": "Enum_wh_minmax"
+              },
+              {
+                "value": "p5",
+                "displayName": "5th to 95th percentile (Pro)",
+                "displayNameKey": "Enum_wh_p5"
+              },
+              {
+                "value": "p10",
+                "displayName": "10th to 90th percentile (Pro)",
+                "displayNameKey": "Enum_wh_p10"
+              }
+            ]
+          }
+        },
+        "caps": {
+          "displayName": "Caps",
+          "displayNameKey": "Prop_whiskers_caps",
+          "type": {
+            "bool": true
+          }
+        },
+        "color": {
+          "displayName": "Whisker color",
+          "displayNameKey": "Prop_whiskers_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "statistics": {
+      "displayName": "Statistics",
+      "displayNameKey": "Obj_statistics",
+      "properties": {
+        "method": {
+          "displayName": "Quartile method",
+          "displayNameKey": "Prop_statistics_method",
+          "type": {
+            "enumeration": [
+              {
+                "value": "linear",
+                "displayName": "Inclusive (Excel QUARTILE.INC)",
+                "displayNameKey": "Enum_m_linear"
+              },
+              {
+                "value": "exclusive",
+                "displayName": "Exclusive (Excel QUARTILE.EXC) (Pro)",
+                "displayNameKey": "Enum_m_exclusive"
+              },
+              {
+                "value": "hinges",
+                "displayName": "Tukey hinges (Pro)",
+                "displayNameKey": "Enum_m_hinges"
+              }
+            ]
+          }
+        },
+        "showN": {
+          "displayName": "Show n under each box",
+          "displayNameKey": "Prop_statistics_showN",
+          "type": {
+            "bool": true
+          }
+        },
+        "medianLabel": {
+          "displayName": "Median label",
+          "displayNameKey": "Prop_statistics_medianLabel",
+          "type": {
+            "bool": true
+          }
+        },
+        "showMean": {
+          "displayName": "Mean marker (Pro)",
+          "displayNameKey": "Prop_statistics_showMean",
+          "type": {
+            "bool": true
+          }
+        },
+        "meanColor": {
+          "displayName": "Mean color",
+          "displayNameKey": "Prop_statistics_meanColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "notches": {
+          "displayName": "Notches (Pro)",
+          "displayNameKey": "Prop_statistics_notches",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    },
+    "points": {
+      "displayName": "Points",
+      "displayNameKey": "Obj_points",
+      "properties": {
+        "show": {
+          "displayName": "Show all points (Pro)",
+          "displayNameKey": "Prop_points_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "jitter": {
+          "displayName": "Jitter %",
+          "displayNameKey": "Prop_points_jitter",
+          "type": {
+            "numeric": true
+          }
+        },
+        "size": {
+          "displayName": "Point size",
+          "displayNameKey": "Prop_points_size",
+          "type": {
+            "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Point color",
+          "displayNameKey": "Prop_points_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "borderColor": {
+          "displayName": "Point border color",
+          "displayNameKey": "Prop_points_borderColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "borderWidth": {
+          "displayName": "Point border width",
+          "displayNameKey": "Prop_points_borderWidth",
+          "type": {
+            "numeric": true
+          }
+        },
+        "opacity": {
+          "displayName": "Point opacity %",
+          "displayNameKey": "Prop_points_opacity",
+          "type": {
+            "numeric": true
+          }
+        },
+        "outlierSize": {
+          "displayName": "Outlier size",
+          "displayNameKey": "Prop_points_outlierSize",
+          "type": {
+            "numeric": true
+          }
+        },
+        "outlierColor": {
+          "displayName": "Outlier color",
+          "displayNameKey": "Prop_points_outlierColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "violin": {
+      "displayName": "Violin",
+      "displayNameKey": "Obj_violin",
+      "properties": {
+        "show": {
+          "displayName": "Show violin (Pro)",
+          "displayNameKey": "Prop_violin_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "opacity": {
+          "displayName": "Violin opacity %",
+          "displayNameKey": "Prop_violin_opacity",
+          "type": {
+            "numeric": true
+          }
+        }
+      }
+    },
+    "sort": {
+      "displayName": "Sort",
+      "displayNameKey": "Obj_sort",
+      "properties": {
+        "by": {
+          "displayName": "Sort boxes by",
+          "displayNameKey": "Prop_sort_by",
+          "type": {
+            "enumeration": [
+              {
+                "value": "data",
+                "displayName": "Data order",
+                "displayNameKey": "Enum_s_data"
+              },
+              {
+                "value": "name",
+                "displayName": "Name",
+                "displayNameKey": "Enum_s_name"
+              },
+              {
+                "value": "median",
+                "displayName": "Median (Pro)",
+                "displayNameKey": "Enum_s_median"
+              },
+              {
+                "value": "mean",
+                "displayName": "Mean (Pro)",
+                "displayNameKey": "Enum_s_mean"
+              },
+              {
+                "value": "iqr",
+                "displayName": "Spread (IQR) (Pro)",
+                "displayNameKey": "Enum_s_iqr"
+              },
+              {
+                "value": "count",
+                "displayName": "Count (Pro)",
+                "displayNameKey": "Enum_s_count"
+              }
+            ]
+          }
+        },
+        "descending": {
+          "displayName": "Descending",
+          "displayNameKey": "Prop_sort_descending",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    },
+    "reference": {
+      "displayName": "Reference lines",
+      "displayNameKey": "Obj_reference",
+      "properties": {
+        "show": {
+          "displayName": "Reference line (Pro)",
+          "displayNameKey": "Prop_reference_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "value": {
+          "displayName": "Value",
+          "displayNameKey": "Prop_reference_value",
+          "type": {
+            "numeric": true
+          }
+        },
+        "label": {
+          "displayName": "Label",
+          "displayNameKey": "Prop_reference_label",
+          "type": {
+            "text": true
+          }
+        },
+        "color": {
+          "displayName": "Line color",
+          "displayNameKey": "Prop_reference_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "show2": {
+          "displayName": "Second line (Pro)",
+          "displayNameKey": "Prop_reference_show2",
+          "type": {
+            "bool": true
+          }
+        },
+        "value2": {
+          "displayName": "Second value",
+          "displayNameKey": "Prop_reference_value2",
+          "type": {
+            "numeric": true
+          }
+        },
+        "label2": {
+          "displayName": "Second label",
+          "displayNameKey": "Prop_reference_label2",
+          "type": {
+            "text": true
+          }
+        }
+      }
+    },
+    "valueAxis": {
+      "displayName": "Value axis",
+      "displayNameKey": "Obj_valueAxis",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_valueAxis_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "title": {
+          "displayName": "Title",
+          "displayNameKey": "Prop_valueAxis_title",
+          "type": {
+            "bool": true
+          }
+        },
+        "titleText": {
+          "displayName": "Title text",
+          "displayNameKey": "Prop_valueAxis_titleText",
+          "type": {
+            "text": true
+          }
+        },
+        "gridlines": {
+          "displayName": "Gridlines",
+          "displayNameKey": "Prop_valueAxis_gridlines",
+          "type": {
+            "bool": true
+          }
+        },
+        "auto": {
+          "displayName": "Automatic range",
+          "displayNameKey": "Prop_valueAxis_auto",
+          "type": {
+            "bool": true
+          }
+        },
+        "min": {
+          "displayName": "Minimum",
+          "displayNameKey": "Prop_valueAxis_min",
+          "type": {
+            "numeric": true
+          }
+        },
+        "max": {
+          "displayName": "Maximum",
+          "displayNameKey": "Prop_valueAxis_max",
+          "type": {
+            "numeric": true
+          }
+        },
+        "fontSize": {
+          "displayName": "Text size",
+          "displayNameKey": "Prop_valueAxis_fontSize",
+          "type": {
+            "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Text color",
+          "displayNameKey": "Prop_valueAxis_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "categoryAxis": {
+      "displayName": "Category axis",
+      "displayNameKey": "Obj_categoryAxis",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_categoryAxis_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "fontSize": {
+          "displayName": "Text size",
+          "displayNameKey": "Prop_categoryAxis_fontSize",
+          "type": {
+            "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Text color",
+          "displayNameKey": "Prop_categoryAxis_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "legend": {
+      "displayName": "Legend",
+      "displayNameKey": "Obj_legend",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_legend_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "position": {
+          "displayName": "Position",
+          "displayNameKey": "Prop_legend_position",
+          "type": {
+            "enumeration": [
+              {
+                "value": "top",
+                "displayName": "Top",
+                "displayNameKey": "Enum_lg_top"
+              },
+              {
+                "value": "bottom",
+                "displayName": "Bottom",
+                "displayNameKey": "Enum_lg_bottom"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "statsTable": {
+      "displayName": "Statistics table",
+      "displayNameKey": "Obj_statsTable",
+      "properties": {
+        "show": {
+          "displayName": "Show table (Pro)",
+          "displayNameKey": "Prop_statsTable_show",
+          "type": {
+            "bool": true
+          }
+        },
+        "fontSize": {
+          "displayName": "Text size",
+          "displayNameKey": "Prop_statsTable_fontSize",
+          "type": {
+            "numeric": true
+          }
+        }
+      }
+    },
+    "background": {
+      "displayName": "Background",
+      "displayNameKey": "Obj_background",
+      "properties": {
+        "color": {
+          "displayName": "Color",
+          "displayNameKey": "Prop_background_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tooltips": {
+    "supportedTypes": {
+      "default": true,
+      "canvas": true
+    },
+    "roles": [
+      "tooltips"
+    ]
+  },
+  "drilldown": {
+    "roles": [
+      "category"
+    ]
+  },
+  "supportsHighlight": false,
+  "supportsLandingPage": true,
+  "supportsEmptyDataView": true,
+  "supportsKeyboardFocus": true,
+  "supportsMultiVisualSelection": true,
+  "privileges": [],
+  "supportsOnObjectFormatting": true,
+  "enablePointerEventsFormatMode": true
+}
