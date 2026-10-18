@@ -62,8 +62,8 @@ interface Settings {
     vAxis: boolean; vTitle: boolean; vTitleText: string; grid: boolean; vAuto: boolean; vMin: number; vMax: number;
     vFont: number; vColor: string;
     cAxis: boolean; cFont: number; cColor: string;
-    legend: boolean; legendPos: string;
-    table: boolean; tableFont: number;
+    legend: boolean; legendPos: string; legendFont: number; legendColor: string;
+    table: boolean; tableFont: number; tableColor: string;
     background: string;
 }
 
@@ -80,8 +80,8 @@ const DEFAULTS: Settings = {
     ref1: false, ref1Value: 0, ref1Label: "", refColor: "#B4541C", ref2: false, ref2Value: 0, ref2Label: "",
     vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C",
     cAxis: true, cFont: 11, cColor: "#605E5C",
-    legend: true, legendPos: "top",
-    table: false, tableFont: 11,
+    legend: true, legendPos: "top", legendFont: 11, legendColor: "#605E5C",
+    table: false, tableFont: 11, tableColor: "#3D3929",
     background: "",
 };
 
@@ -135,7 +135,9 @@ function readSettings(objects: Objects): Settings {
         vMax: pick("valueAxis", "max", "vMax"), vFont: pick("valueAxis", "fontSize", "vFont"), vColor: pick("valueAxis", "color", "vColor"),
         cAxis: pick("categoryAxis", "show", "cAxis"), cFont: pick("categoryAxis", "fontSize", "cFont"), cColor: pick("categoryAxis", "color", "cColor"),
         legend: pick("legend", "show", "legend"), legendPos: pick("legend", "position", "legendPos"),
+        legendFont: pick("legend", "fontSize", "legendFont"), legendColor: pick("legend", "color", "legendColor"),
         table: pick("statsTable", "show", "table"), tableFont: pick("statsTable", "fontSize", "tableFont"),
+        tableColor: pick("statsTable", "color", "tableColor"),
         background: pick("background", "color", "background"),
     };
 }
@@ -561,16 +563,19 @@ export class Visual implements IVisual {
         let top = 6, bottom = 6;
         if (this.groups.length && s.legend && H > 140) {
             const lg = this.el("g", { class: "tcbw-legend" }, this.svg);
-            const y = s.legendPos === "bottom" ? H - 14 : 12;
+            this.subSelectable(lg, "legend", this.t("Obj_legend", "Legend"), powerbi.visuals.SubSelectionStylesType.Text);
+            const fl = clamp(s.legendFont, 6, 30);
+            const rowH = fl + 9;
+            const y = s.legendPos === "bottom" ? H - rowH / 2 - 2 : rowH / 2 + 2;
             let x = 8;
             this.groups.forEach(g => {
                 if (x > W - 40) return;
-                this.el("rect", { x, y: y - 8, width: 10, height: 10, rx: 2, fill: hc.on ? hc.fg : this.groupColor(g) }, lg);
-                const t = this.el("text", { x: x + 14, y: y + 1, "font-size": fontC, fill: hc.on ? hc.fg : s.cColor }, lg);
+                this.el("rect", { x, y: y - fl * 0.45, width: fl * 0.9, height: fl * 0.9, rx: 2, fill: hc.on ? hc.fg : this.groupColor(g) }, lg);
+                const t = this.el("text", { x: x + fl * 0.9 + 5, y: y + fl * 0.35, "font-size": fl, fill: hc.on ? hc.fg : s.legendColor }, lg);
                 t.textContent = g;
-                x += 24 + Math.min(140, g.length * fontC * 0.6);
+                x += fl * 0.9 + 18 + Math.min(160, g.length * fl * 0.6);
             });
-            if (s.legendPos === "bottom") bottom += 20; else top += 20;
+            if (s.legendPos === "bottom") bottom += rowH + 4; else top += rowH + 4;
         }
 
         // Escala común a todos los paneles
@@ -837,8 +842,11 @@ export class Visual implements IVisual {
         el.style.maxHeight = maxH + "px";
         el.style.fontSize = clamp(s.tableFont, 7, 24) + "px";
         const hc = this.hc();
-        el.style.color = hc.on ? hc.fg : "#3D3929";
+        el.style.color = hc.on ? hc.fg : (s.tableColor || "#3D3929");
         const table = document.createElement("table");
+        // Una tabla no siempre hereda color y tamaño (modo quirks del iframe): se fijan en ella.
+        table.style.color = el.style.color;
+        table.style.fontSize = el.style.fontSize;
         const head = document.createElement("tr");
         const cols = [this.t("UI_Category", "Category")]
             .concat(this.groups.length ? [this.t("UI_Group", "Group")] : [])
@@ -1220,6 +1228,10 @@ export class Visual implements IVisual {
                 return { type: powerbi.visuals.SubSelectionStylesType.Text,
                     fontSize: ref("categoryAxis", "fontSize", this.t("Prop_categoryAxis_fontSize", "Text size")),
                     fontColor: ref("categoryAxis", "color", this.t("Prop_categoryAxis_color", "Text color")) } as any;
+            case "legend":
+                return { type: powerbi.visuals.SubSelectionStylesType.Text,
+                    fontSize: ref("legend", "fontSize", this.t("Prop_legend_fontSize", "Text size")),
+                    fontColor: ref("legend", "color", this.t("Prop_legend_color", "Text color")) } as any;
             case "background":
                 return { type: powerbi.visuals.SubSelectionStylesType.Shape,
                     fill: ref("background", "color", this.t("Prop_background_color", "Color")) } as any;
@@ -1252,6 +1264,13 @@ export class Visual implements IVisual {
                 return [
                     { type: powerbi.visuals.VisualShortcutType.Reset, relatedResetFormattingIds: [id("categoryAxis", "fontSize"), id("categoryAxis", "color")] },
                     nav("categoryAxis", this.t("Obj_categoryAxis", "Category axis")),
+                ] as any;
+            case "legend":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Picker, ...id("legend", "position"), label: this.t("Prop_legend_position", "Position") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    { type: powerbi.visuals.VisualShortcutType.Reset, relatedResetFormattingIds: [id("legend", "fontSize"), id("legend", "color")] },
+                    nav("legend", this.t("Obj_legend", "Legend")),
                 ] as any;
             case "background":
                 return [
@@ -1370,10 +1389,13 @@ export class Visual implements IVisual {
             card("legend", "Legend", [
                 tog("legend", "show", "Show", s.legend),
                 dd("legend", "position", "Position", s.legendPos, [["top", "Enum_lg_top", "Top"], ["bottom", "Enum_lg_bottom", "Bottom"]]),
+                num("legend", "fontSize", "Text size", s.legendFont),
+                col("legend", "color", "Text color", s.legendColor),
             ]),
             card("statsTable", "Statistics table", [
                 tog("statsTable", "show", "Show table (Pro)", s.table),
                 num("statsTable", "fontSize", "Text size", s.tableFont),
+                col("statsTable", "color", "Text color", s.tableColor),
             ]),
             card("background", "Background", [
                 col("background", "color", "Color", s.background),

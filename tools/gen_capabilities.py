@@ -105,10 +105,13 @@ OBJECTS = [
     ("legend", "Legend", [
         ("show", "Show", "bool"),
         ("position", "Position", E(("top", "Enum_lg_top", "Top"), ("bottom", "Enum_lg_bottom", "Bottom"))),
+        ("fontSize", "Text size", "num"),
+        ("color", "Text color", "color"),
     ]),
     ("statsTable", "Statistics table", [
         ("show", "Show table (Pro)", "bool"),
         ("fontSize", "Text size", "num"),
+        ("color", "Text color", "color"),
     ]),
     ("background", "Background", [
         ("color", "Color", "color"),

@@ -731,6 +731,24 @@
               }
             ]
           }
+        },
+        "fontSize": {
+          "displayName": "Text size",
+          "displayNameKey": "Prop_legend_fontSize",
+          "type": {
+            "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Text color",
+          "displayNameKey": "Prop_legend_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
         }
       }
     },
@@ -750,6 +768,17 @@
           "displayNameKey": "Prop_statsTable_fontSize",
           "type": {
             "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Text color",
+          "displayNameKey": "Prop_statsTable_color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
           }
         }
       }

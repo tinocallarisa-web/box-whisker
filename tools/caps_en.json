@@ -99,9 +99,12 @@
   "Prop_legend_position": "Position",
   "Enum_lg_top": "Top",
   "Enum_lg_bottom": "Bottom",
+  "Prop_legend_fontSize": "Text size",
+  "Prop_legend_color": "Text color",
   "Obj_statsTable": "Statistics table",
   "Prop_statsTable_show": "Show table (Pro)",
   "Prop_statsTable_fontSize": "Text size",
+  "Prop_statsTable_color": "Text color",
   "Obj_background": "Background",
   "Prop_background_color": "Color"
 }
