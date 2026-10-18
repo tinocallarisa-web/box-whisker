@@ -738,7 +738,7 @@ export class Visual implements IVisual {
 
         // Violín (Pro): detrás de la caja
         if (s.violin && st.n >= 3) {
-            const dens = density(b.values, st.sd, st.q1, st.q3);
+            const dens = density(b.values, st.sd, st.q1, st.q3, 48, this.allInt ? 0.6 : 0);
             const maxD = Math.max(...dens.map(d => d.d)) || 1;
             const half = sub * 0.45;
             const side = (sign: number) => dens.map(d => P(center + sign * d.d / maxD * half, vPix(d.y)));

@@ -82,11 +82,13 @@ export function boxStats(sorted: number[], method: QuartileMethod, rule: Whisker
  * Densidad por núcleo gaussiano para el violín. Ancho de banda de Silverman; se evalúa en `steps`
  * puntos entre min y max de la caja (el violín no se inventa cola fuera de los datos).
  */
-export function density(sorted: number[], sd: number, q1: number, q3: number, steps = 48): { y: number; d: number }[] {
+export function density(sorted: number[], sd: number, q1: number, q3: number, steps = 48, minBw = 0): { y: number; d: number }[] {
     const n = sorted.length;
     if (n < 3) return [];
     const spread = Math.min(sd, (q3 - q1) / 1.34) || sd || 1;
-    const bw = 0.9 * spread * Math.pow(n, -0.2) || 1;
+    // Con datos enteros (notas de 1 a 10) un ancho menor que ~0,6 dibuja una "cintura" entre cada valor:
+    // forma que los datos no tienen. minBw lo evita.
+    const bw = Math.max(minBw, 0.9 * spread * Math.pow(n, -0.2)) || 1;
     const lo = sorted[0], hi = sorted[n - 1];
     if (hi <= lo) return [];
     // Muestreo para que 30.000 filas no cuesten 48 × 30.000 exponenciales por caja.
