@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "凹口 (Pro)",
   "Obj_points": "点",
   "Prop_points_show": "显示所有点 (Pro)",
-  "Prop_points_jitter": "抖动 %",
+  "Prop_points_jitter": "点的抖动 %",
   "Prop_points_size": "点大小",
   "Prop_points_color": "点颜色",
   "Prop_points_borderColor": "点边框颜色",

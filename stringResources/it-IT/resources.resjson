@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "Tacche (Pro)",
   "Obj_points": "Punti",
   "Prop_points_show": "Mostra tutti i punti (Pro)",
-  "Prop_points_jitter": "Dispersione %",
+  "Prop_points_jitter": "Separazione dei punti %",
   "Prop_points_size": "Dimensione punti",
   "Prop_points_color": "Colore punti",
   "Prop_points_borderColor": "Colore bordo punti",

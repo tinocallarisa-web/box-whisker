@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "Kerben (Pro)",
   "Obj_points": "Punkte",
   "Prop_points_show": "Alle Punkte anzeigen (Pro)",
-  "Prop_points_jitter": "Streuung %",
+  "Prop_points_jitter": "Punktabstand %",
   "Prop_points_size": "Punktgröße",
   "Prop_points_color": "Punktfarbe",
   "Prop_points_borderColor": "Punktrahmenfarbe",

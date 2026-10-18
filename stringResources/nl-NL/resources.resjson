@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "Inkepingen (Pro)",
   "Obj_points": "Punten",
   "Prop_points_show": "Alle punten tonen (Pro)",
-  "Prop_points_jitter": "Spreiding %",
+  "Prop_points_jitter": "Puntafstand %",
   "Prop_points_size": "Puntgrootte",
   "Prop_points_color": "Puntkleur",
   "Prop_points_borderColor": "Randkleur punten",

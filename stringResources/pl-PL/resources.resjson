@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "Wcięcia (Pro)",
   "Obj_points": "Punkty",
   "Prop_points_show": "Pokaż wszystkie punkty (Pro)",
-  "Prop_points_jitter": "Rozrzut %",
+  "Prop_points_jitter": "Rozsunięcie punktów %",
   "Prop_points_size": "Rozmiar punktu",
   "Prop_points_color": "Kolor punktów",
   "Prop_points_borderColor": "Kolor obramowania punktów",

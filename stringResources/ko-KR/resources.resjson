@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "노치(Pro)",
   "Obj_points": "점",
   "Prop_points_show": "모든 점 표시(Pro)",
-  "Prop_points_jitter": "지터 %",
+  "Prop_points_jitter": "점 지터 %",
   "Prop_points_size": "점 크기",
   "Prop_points_color": "점 색",
   "Prop_points_borderColor": "점 테두리 색",

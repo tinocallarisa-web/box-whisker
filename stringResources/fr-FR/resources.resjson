@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "Encoches (Pro)",
   "Obj_points": "Points",
   "Prop_points_show": "Afficher tous les points (Pro)",
-  "Prop_points_jitter": "Dispersion %",
+  "Prop_points_jitter": "Écartement des points %",
   "Prop_points_size": "Taille des points",
   "Prop_points_color": "Couleur des points",
   "Prop_points_borderColor": "Couleur de bordure des points",

@@ -52,7 +52,7 @@
   "Prop_statistics_notches": "ノッチ (Pro)",
   "Obj_points": "点",
   "Prop_points_show": "すべての点を表示 (Pro)",
-  "Prop_points_jitter": "ジッター %",
+  "Prop_points_jitter": "点のジッター %",
   "Prop_points_size": "点のサイズ",
   "Prop_points_color": "点の色",
   "Prop_points_borderColor": "点の枠線の色",
