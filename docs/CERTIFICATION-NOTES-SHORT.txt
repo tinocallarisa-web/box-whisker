@@ -1,0 +1,40 @@
+Box & Whisker by TCViz 1.0.0.0 - GUID boxWhiskerTCViz2CE5A430433541F1A1D3467185EBA171
+
+SOURCE CODE
+github.com/tinocallarisa-web/box-whisker, branch "certification". Public, no credentials.
+
+TESTING THE PREMIUM FEATURES - NO KEY NEEDED
+Pro is granted by the AppSource plan through IVisualLicenseManager; no activation key exists.
+Import this .pbiviz and open a report in EDIT mode without a licence: each Pro capability is
+drawn WORKING under a "Pro preview" watermark that names it, and Power BI shows its licence
+notice. Reading view shows the free result.
+
+WHAT TO CHECK
+1. Empty visual: start screen with the steps; resize it (three layouts).
+2. Sample report: Category = Plant, Value = Quality score, Detail (rows) = Inspection ID.
+Boxes, whiskers, outliers and n per box.
+3. Pro, editing without licence: put Shift in Group and Year in Small multiples; turn on
+Points > Show all points, Violin, Statistics > Mean, Statistics table. Watermark appears.
+4. Click a box: other visuals filter by that category (all its rows). Ctrl+click adds.
+Bookmark, clear, apply bookmark: the selection comes back.
+5. Keyboard: arrows move between boxes, Enter selects, Esc clears. High contrast theme.
+6. Format mode: click a box, an axis, the legend or the background - on-object panes.
+
+LINKS ON THE START SCREEN
+Guide (support page) and Product page (tcviz.com) open only on click or Enter, through
+host.launchUrl. The visual makes no request of its own; the icon is bundled.
+
+ROWS
+Categorical mapping, window of 30,000 rows; host.fetchMoreData(true) loads further segments
+(capped at 40). In Desktop only the first segment arrives: the warning icon says how many
+rows were used.
+
+PRIVACY
+privileges []. No network, no telemetry, no browser storage, no persistProperties.
+No innerHTML. Texts in 12 languages; the visual's own texts are bundled because Desktop only
+resolves keys declared in capabilities.json.
+
+Rendering events: one started/finished pair per update(); the licence repaint does not call
+update(). eslint (powerbi-visuals plugin) 0 errors.
+
+Support/privacy/terms: tinocallarisa-web.github.io/box-whisker/
