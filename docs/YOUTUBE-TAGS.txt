@@ -1,0 +1,19 @@
+==========================================
+YOUTUBE TAGS — PASTE THIS BLOCK (under 500 characters)
+==========================================
+
+Power BI,Power BI custom visual,box plot,box and whisker,Power BI box plot,box and whisker chart,quartiles,median,outliers,outlier analysis,distribution chart,violin plot,small multiples,IQR,statistics Power BI,AppSource,data visualization,TCViz,Box & Whisker by TCViz
+
+
+==========================================
+EXTRA TAGS (swap in by audience)
+==========================================
+
+Quality and operations:
+quality control, process variability, SPC, cycle time analysis, inspection scores
+
+HR and service:
+response time analysis, resolution time, salary distribution, performance spread
+
+Power BI general:
+Power BI tutorial, Power BI tips, Power BI dashboard, IBCS, statistics table

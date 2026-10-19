@@ -1,0 +1,98 @@
+==========================================
+TITLE (pick one)
+==========================================
+
+1. Box & Whisker for Power BI: see how your values spread, not just the average
+2. Power BI box plot: median, quartiles and outliers in one visual
+3. Two teams, same average, very different results: a box plot in Power BI
+4. Box plot in Power BI with groups, violin and small multiples
+
+(Recommended: 1 for the release video, 3 for a short.)
+
+
+==========================================
+YOUTUBE DESCRIPTION — FULL VIDEO
+==========================================
+
+An average hides the story. Two plants can both score 70 on average while one is predictable and the other swings from 30 to 95. Box & Whisker by TCViz shows how the values of each category are spread: the median, the middle half of the values, how far the normal range reaches and which cases fall outside it. Power BI has no built-in box plot.
+
+Get it on Microsoft AppSource: https://marketplace.microsoft.com/en-us/product/tino_callarisa.box-whisker-tcviz
+Documentation and how to read a box plot: https://tinocallarisa-web.github.io/box-whisker/support.html
+
+──────────────────────────────────────────
+CHAPTERS
+──────────────────────────────────────────
+0:00 The question: same average, different reality
+0:00 Category, Value and Detail: the first box plot
+0:00 How to read it: median, quartiles, whiskers and outliers
+0:00 n under every box and the quartile method in the tooltip
+0:00 Group: boxes side by side, with a legend
+0:00 Small multiples on a shared scale
+0:00 All points, mean, notches and the violin
+0:00 Sort by median and reference lines
+0:00 Statistics table
+0:00 Style templates, IBCS style and format on the canvas
+0:00 Click a box to filter the report
+0:00 Free and Pro
+
+(Fill in the timestamps from the final edit. Delete any chapter the video does not show.)
+
+──────────────────────────────────────────
+WHAT IT DOES
+──────────────────────────────────────────
+✅ One box per category: median, first and third quartile, whiskers and outliers
+✅ n under every box, so a box built on 12 rows is not mistaken for one built on 12,000
+✅ Whiskers at 1.5 × IQR (Tukey) or minimum to maximum
+✅ Quartiles with the inclusive method, the same as Excel QUARTILE.INC, named in every tooltip
+✅ Vertical or horizontal; six style templates, including an IBCS style
+✅ Click a box to filter the report; bookmarks, drilldown, keyboard navigation and high contrast
+✅ The measure's number format and the report language; twelve languages
+✅ No network requests: every statistic is computed inside your report
+
+Useful in quality, operations, HR, service and sales: anywhere the question is "how consistent is it?", not only "how much on average?".
+
+──────────────────────────────────────────
+FREE AND PRO
+──────────────────────────────────────────
+FREE — a complete box plot:
+• Boxes, whiskers, outliers and n for every category
+• Tukey or minimum-to-maximum whiskers, inclusive quartiles
+• Templates, colours with conditional formatting, axes, sorting by name
+
+PRO — ways to read and compare it:
+• Group: boxes side by side with a legend
+• Small multiples on a shared scale
+• All points with jitter, mean marker, notches and a violin
+• Colour by quartile; sort by median, mean, IQR or count
+• Exclusive quartiles and Tukey hinges; whiskers at the 5th–95th or 10th–90th percentile
+• Two reference lines and a statistics table
+
+Turn on a Pro feature while editing without a licence and it is drawn working on your own data, under a "Pro preview" watermark.
+
+──────────────────────────────────────────
+LINKS
+──────────────────────────────────────────
+Documentation: https://tinocallarisa-web.github.io/box-whisker/support.html
+Questions: https://github.com/tinocallarisa-web/box-whisker/discussions
+All TCViz visuals: https://tcviz.com
+Support: support@tcviz.com
+
+#PowerBI #BoxPlot #DataVisualization
+
+
+==========================================
+SHORT (under 60 s) — DESCRIPTION
+==========================================
+
+Same average, very different results. A box plot in Power BI shows the spread, the median and the outliers of each category.
+Box & Whisker by TCViz: https://marketplace.microsoft.com/en-us/product/tino_callarisa.box-whisker-tcviz
+
+#PowerBI #BoxPlot #Shorts
+
+
+==========================================
+NOTE
+==========================================
+The AppSource link works once the offer is published. Until then, publish the video as unlisted or use the
+documentation link. After uploading, paste the canonical URL (https://www.youtube.com/watch?v=…) in Partner Center
+(Offer listing → Videos) and in tools/gen_docs.py (VIDEO), then regenerate the docs. Never a youtu.be link.
