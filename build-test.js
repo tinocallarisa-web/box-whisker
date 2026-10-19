@@ -48,10 +48,20 @@ json.visual.guid += suffix;
 json.visual.displayName += free ? " (test free)" : " (test)";
 fs.writeFileSync(PBIVIZ, JSON.stringify(json, null, 2) + "\n", "utf8");
 
+const debug = process.argv.includes("--debug");
+let vsrc = origV;
+if (debug) {
+    if (vsrc.indexOf("const DEBUG_SEL = false;") === -1) { console.error("❌ No encuentro DEBUG_SEL en visual.ts"); process.exit(1); }
+    vsrc = vsrc.replace("const DEBUG_SEL = false;", "const DEBUG_SEL = true; // PATCHED BY build-test.js --debug");
+    json.visual.guid += "DIAG";
+    json.visual.displayName += " DIAG";
+    fs.writeFileSync(PBIVIZ, JSON.stringify(json, null, 2) + "\n", "utf8");
+    fs.writeFileSync(VISUAL, vsrc, "utf8");
+}
 if (!free) {
     const FIND = "    private isPro = false;";
     if (origV.indexOf(FIND) === -1) { console.error("❌ No encuentro '" + FIND.trim() + "' en visual.ts: actualiza build-test.js."); process.exit(1); }
-    fs.writeFileSync(VISUAL, origV.replace(FIND, "    private isPro = true; // PATCHED BY build-test.js"), "utf8");
+    fs.writeFileSync(VISUAL, vsrc.replace(FIND, "    private isPro = true; // PATCHED BY build-test.js"), "utf8");
 }
 try {
     execSync("npx pbiviz package", { stdio: "inherit", cwd: __dirname });

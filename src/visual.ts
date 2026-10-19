@@ -32,6 +32,8 @@ const STATE_ACTIVE = 1;
 const STATE_WARNING = 2;
 /** LicenseNotificationType.General: const enum, en runtime hace falta el número. */
 const NOTIFY_GENERAL = 0;
+/** Diagnóstico de selección: build-test.js --debug lo pone a true. En producción, siempre false. */
+const DEBUG_SEL = false;
 
 function matchesPlan(sp: string, planId: string): boolean {
     return sp === planId || sp.endsWith("." + planId);
@@ -1073,6 +1075,15 @@ export class Visual implements IVisual {
             siguiente = actual.size === 1 && actual.has(b.key) ? [] : [b];
         }
         const ids = ([] as ISelectionId[]).concat(...siguiente.map(x => x.ids));
+        if (DEBUG_SEL) {
+            const keys = ids.map(i => this.keyOf(i));
+            this.noteEl.style.display = "block";
+            this.noteEl.style.whiteSpace = "normal";
+            this.noteEl.style.background = "#FFF7E6";
+            this.noteEl.style.color = "#3D3929";
+            this.noteEl.textContent = `DIAG caja=${b.key.replace(//g, "|")} n=${b.stats.n} ids=${ids.length} claves únicas=${new Set(keys).size} ` +
+                `· clave1=${keys[0]} · clave2=${keys[1] ?? "-"} · selector1=${JSON.stringify((ids[0] as any)?.getSelector?.() ?? null).slice(0, 160)}`;
+        }
         (ids.length ? this.selectionManager.select(ids, false) : this.selectionManager.clear()).then(() => this.paintSelection());
     }
 
