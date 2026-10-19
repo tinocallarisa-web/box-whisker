@@ -142,7 +142,7 @@
   "UI_ReadingFree": "Fonctions Pro non appliquées en mode lecture :",
   "UI_ProPreview": "Aperçu Pro",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop n’envoie au visuel que les premières lignes : publiez dans le service pour toutes les utiliser.",
+  "UI_WarnRowsDesktop": "Dans Power BI Desktop, le visuel utilise les premières lignes envoyées par Power BI : publiez dans le service pour toutes les utiliser.",
   "UI_WarnRows": "Power BI n’a envoyé qu’une partie des lignes : les boîtes reflètent les lignes reçues.",
   "UI_Method": "Quartiles",
   "UI_Avg": "moy.",

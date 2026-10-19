@@ -52,7 +52,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Desv. est.",
         "UI_ShowGrid": "Mostrar líneas de cuadrícula",
         "UI_WarnRows": "Power BI solo ha enviado parte de las filas: las cajas reflejan las filas recibidas.",
-        "UI_WarnRowsDesktop": "Power BI Desktop solo envía al visual las primeras filas: publica en el servicio para usarlas todas."
+        "UI_WarnRowsDesktop": "En Power BI Desktop el visual usa las primeras filas que envía Power BI: publica en el servicio para usarlas todas."
     },
     "pt-BR": {
         "Feat_group": "grupos",
@@ -103,7 +103,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Desv. pad.",
         "UI_ShowGrid": "Mostrar linhas de grade",
         "UI_WarnRows": "O Power BI enviou só parte das linhas: as caixas refletem as linhas recebidas.",
-        "UI_WarnRowsDesktop": "O Power BI Desktop envia ao visual só as primeiras linhas: publique no serviço para usar todas."
+        "UI_WarnRowsDesktop": "No Power BI Desktop o visual usa as primeiras linhas que o Power BI envia: publique no serviço para usar todas."
     },
     "fr-FR": {
         "Feat_group": "groupes",
@@ -150,7 +150,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Écart type",
         "UI_ShowGrid": "Afficher le quadrillage",
         "UI_WarnRows": "Power BI n’a envoyé qu’une partie des lignes : les boîtes reflètent les lignes reçues.",
-        "UI_WarnRowsDesktop": "Power BI Desktop n’envoie au visuel que les premières lignes : publiez dans le service pour toutes les utiliser."
+        "UI_WarnRowsDesktop": "Dans Power BI Desktop, le visuel utilise les premières lignes envoyées par Power BI : publiez dans le service pour toutes les utiliser."
     },
     "de-DE": {
         "Feat_group": "Gruppen",
@@ -198,7 +198,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Std.-Abw.",
         "UI_ShowGrid": "Gitternetzlinien anzeigen",
         "UI_WarnRows": "Power BI hat nur einen Teil der Zeilen gesendet: Die Kästen zeigen die empfangenen Zeilen.",
-        "UI_WarnRowsDesktop": "Power BI Desktop sendet einem Visual nur die ersten Zeilen: Veröffentlichen Sie im Dienst, um alle zu nutzen."
+        "UI_WarnRowsDesktop": "In Power BI Desktop verwendet das Visual die ersten Zeilen, die Power BI sendet: Veröffentlichen Sie im Dienst, um alle zu nutzen."
     },
     "it-IT": {
         "Feat_group": "gruppi",
@@ -247,7 +247,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Dev. std.",
         "UI_ShowGrid": "Mostra griglia",
         "UI_WarnRows": "Power BI ha inviato solo una parte delle righe: le scatole riflettono le righe ricevute.",
-        "UI_WarnRowsDesktop": "Power BI Desktop invia all’oggetto visivo solo le prime righe: pubblica nel servizio per usarle tutte."
+        "UI_WarnRowsDesktop": "In Power BI Desktop l’oggetto visivo usa le prime righe inviate da Power BI: pubblica nel servizio per usarle tutte."
     },
     "nl-NL": {
         "Feat_group": "groepen",
@@ -295,7 +295,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Std.afw.",
         "UI_ShowGrid": "Rasterlijnen tonen",
         "UI_WarnRows": "Power BI heeft maar een deel van de rijen gestuurd: de boxen tonen de ontvangen rijen.",
-        "UI_WarnRowsDesktop": "Power BI Desktop stuurt een visual alleen de eerste rijen: publiceer naar de service om ze allemaal te gebruiken."
+        "UI_WarnRowsDesktop": "In Power BI Desktop gebruikt de visual de eerste rijen die Power BI stuurt: publiceer naar de service om ze allemaal te gebruiken."
     },
     "pl-PL": {
         "Feat_group": "grupy",
@@ -344,7 +344,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Odch. std.",
         "UI_ShowGrid": "Pokaż linie siatki",
         "UI_WarnRows": "Power BI wysłał tylko część wierszy: pudełka odzwierciedlają otrzymane wiersze.",
-        "UI_WarnRowsDesktop": "Power BI Desktop wysyła do wizualizacji tylko pierwsze wiersze: opublikuj w usłudze, aby użyć wszystkich."
+        "UI_WarnRowsDesktop": "W Power BI Desktop wizualizacja używa pierwszych wierszy wysłanych przez Power BI: opublikuj w usłudze, aby użyć wszystkich."
     },
     "ja-JP": {
         "Feat_group": "グループ",
@@ -395,7 +395,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "標準偏差",
         "UI_ShowGrid": "グリッド線を表示",
         "UI_WarnRows": "Power BI は行の一部だけを送りました。箱は受け取った行を表しています。",
-        "UI_WarnRowsDesktop": "Power BI Desktop はビジュアルに最初の行だけを送ります。すべて使うにはサービスに発行してください。"
+        "UI_WarnRowsDesktop": "Power BI Desktop では、Power BI が送る最初の行だけを使います。すべて使うにはサービスに発行してください。"
     },
     "zh-CN": {
         "Feat_group": "分组",
@@ -446,7 +446,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "标准差",
         "UI_ShowGrid": "显示网格线",
         "UI_WarnRows": "Power BI 只发送了部分行：箱体反映已收到的行。",
-        "UI_WarnRowsDesktop": "Power BI Desktop 只向视觉对象发送前面的行：发布到服务即可使用全部行。"
+        "UI_WarnRowsDesktop": "在 Power BI Desktop 中，视觉对象使用 Power BI 发送的前几行：发布到服务即可使用全部行。"
     },
     "ko-KR": {
         "Feat_group": "그룹",
@@ -497,7 +497,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "표준 편차",
         "UI_ShowGrid": "눈금선 표시",
         "UI_WarnRows": "Power BI가 행의 일부만 보냈습니다. 상자는 받은 행을 반영합니다.",
-        "UI_WarnRowsDesktop": "Power BI Desktop은 시각적 개체에 처음 행만 보냅니다. 모두 사용하려면 서비스에 게시하세요."
+        "UI_WarnRowsDesktop": "Power BI Desktop에서는 Power BI가 보낸 처음 행을 사용합니다. 모두 사용하려면 서비스에 게시하세요."
     },
     "pt-PT": {
         "Feat_group": "grupos",
@@ -548,6 +548,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "UI_SD": "Desv. pad.",
         "UI_ShowGrid": "Mostrar linhas de grade",
         "UI_WarnRows": "O Power BI enviou só parte das linhas: as caixas refletem as linhas recebidas.",
-        "UI_WarnRowsDesktop": "O Power BI Desktop envia ao visual só as primeiras linhas: publique no serviço para usar todas."
+        "UI_WarnRowsDesktop": "No Power BI Desktop o visual usa as primeiras linhas que o Power BI envia: publique no serviço para usar todas."
     }
 };

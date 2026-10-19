@@ -13,7 +13,7 @@
  "UI_ReadingFree": "Pro features not applied in reading view:",
  "UI_ProPreview": "Pro preview",
  "UI_WarnTitle": "Box & Whisker",
- "UI_WarnRowsDesktop": "Power BI Desktop sends a visual only the first rows: publish to the Service to use them all.",
+ "UI_WarnRowsDesktop": "In Power BI Desktop the visual uses the first rows Power BI sends: publish to the service to use them all.",
  "UI_WarnRows": "Power BI sent only part of the rows: the boxes reflect the rows received.",
  "UI_Method": "Quartiles",
  "UI_Avg": "avg",

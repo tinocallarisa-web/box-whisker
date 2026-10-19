@@ -7,7 +7,8 @@ TESTING THE PREMIUM FEATURES - NO KEY NEEDED
 Pro is granted by the AppSource plan through IVisualLicenseManager; no activation key exists.
 Import this .pbiviz and open a report in EDIT mode without a licence: each Pro capability is
 drawn WORKING under a "Pro preview" watermark that names it, and Power BI shows its licence
-notice. Reading view shows the free result.
+notice. Reading view shows the free result. Sign in to Power BI Desktop: without licence
+information Power BI reports an unsupported environment and Pro stays off, with no watermark.
 
 WHAT TO CHECK
 1. Empty visual: start screen with the steps; resize it (three layouts).
@@ -15,7 +16,8 @@ WHAT TO CHECK
 Boxes, whiskers, outliers and n per box.
 3. Pro, editing without licence: put Shift in Group and Year in Small multiples; turn on
 Points > Show all points, Violin, Statistics > Mean, Statistics table. Watermark appears.
-4. Click a box: other visuals filter by that category (all its rows). Ctrl+click adds.
+4. Click a box: other visuals filter by all the rows of the box (one identity per row).
+Click again to clear; Ctrl+click adds.
 Bookmark, clear, apply bookmark: the selection comes back.
 5. Keyboard: arrows move between boxes, Enter selects, Esc clears. High contrast theme.
 6. Format mode: click a box, an axis, the legend or the background - on-object panes.
@@ -25,9 +27,9 @@ Guide (support page) and Product page (tcviz.com) open only on click or Enter, t
 host.launchUrl. The visual makes no request of its own; the icon is bundled.
 
 ROWS
-Categorical mapping, window of 30,000 rows; host.fetchMoreData(true) loads further segments
-(capped at 40). In Desktop only the first segment arrives: the warning icon says how many
-rows were used.
+Categorical mapping, window of 30,000 rows. In the service host.fetchMoreData(true) loads
+further segments (capped at 40). In Desktop the visual uses the first 30,000 rows and does
+not request more. When rows are left out, the warning icon says how many were used.
 
 PRIVACY
 privileges []. No network, no telemetry, no browser storage, no persistProperties.

@@ -142,7 +142,7 @@
   "UI_ReadingFree": "Pro-functies niet toegepast in leesweergave:",
   "UI_ProPreview": "Pro-voorbeeld",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop stuurt een visual alleen de eerste rijen: publiceer naar de service om ze allemaal te gebruiken.",
+  "UI_WarnRowsDesktop": "In Power BI Desktop gebruikt de visual de eerste rijen die Power BI stuurt: publiceer naar de service om ze allemaal te gebruiken.",
   "UI_WarnRows": "Power BI heeft maar een deel van de rijen gestuurd: de boxen tonen de ontvangen rijen.",
   "UI_Method": "Kwartielen",
   "UI_Avg": "gem.",

@@ -58,19 +58,19 @@ def page(title, sub, body, nav="", search=False):
 # ── Datos comunes ────────────────────────────────────────────────────────────
 
 FIELDS = [
-    ("Category", "Grouping", "Yes", "One box per value: region, product, team. Add a hierarchy to drill down."),
-    ("Value", "Measure", "Yes", "The measure whose distribution is drawn. It is evaluated for each row of Detail."),
-    ("Detail (rows)", "Grouping", "Yes, in practice", "The ID of each observation — order, employee, ticket, inspection. Without it Power BI sends one total per category and there is no distribution; the visual says so."),
-    ("Group", "Grouping", "No — Pro", "Boxes side by side inside each category, coloured by group, with a legend."),
-    ("Small multiples", "Grouping", "No — Pro", "One panel per value, all on the same value scale."),
+    ("Category", "Grouping", "Yes", "One box per value: region, product, team. Add a hierarchy to drill down; with Expand all, one box per combination of levels."),
+    ("Value", "Measure", "Yes, one field", "The measure whose distribution is drawn, evaluated for each row of Detail. Rows with an empty or non-numeric value are not counted in n."),
+    ("Detail (rows)", "Grouping", "Yes in practice, one field", "The ID of each observation — order, employee, ticket, inspection. Without it Power BI sends one total per category and there is no distribution; the visual says so."),
+    ("Group", "Grouping", "No — Pro, one field", "Boxes side by side inside each category, coloured by group, with a legend. Without Pro the field is ignored and the free result is drawn."),
+    ("Small multiples", "Grouping", "No — Pro, one field", "One panel per value, all on the same value scale."),
     ("Tooltips", "Measure", "No", "Extra measures in the tooltip, shown as the average over the rows of the box."),
 ]
 
 FREE_PRO = [
     ("Boxes, whiskers and outliers per category", "✓", "✓"),
     ("Whiskers at 1.5 × IQR (Tukey) or minimum to maximum", "✓", "✓"),
-    ("Outliers always drawn", "✓", "✓"),
-    ("n under each box, median label, full statistics in the tooltip", "✓", "✓"),
+    ("Outliers always drawn, also on top of the points", "✓", "✓"),
+    ("n under each box, median label; n, min, quartiles, median, max, mean, outlier count and quartile method in the tooltip", "✓", "✓"),
     ("Quartiles: inclusive method (Excel QUARTILE.INC)", "✓", "✓"),
     ("Vertical or horizontal; 6 style templates, including IBCS style", "✓", "✓"),
     ("Box colour with conditional formatting (fx)", "✓", "✓"),
@@ -81,7 +81,7 @@ FREE_PRO = [
     ("Group: side-by-side boxes with legend", "—", "✓"),
     ("Small multiples, with columns, spacing, titles, panel background and border", "—", "✓"),
     ("All points with jitter (separation, size, colour, border, opacity)", "—", "✓"),
-    ("Mean marker and notches (95 % interval of the median)", "—", "✓"),
+    ("Mean marker and notches (approximate 95 % interval of the median, McGill)", "—", "✓"),
     ("Violin (density) behind each box", "—", "✓"),
     ("Colour by quartile", "—", "✓"),
     ("Exclusive quartiles (Excel QUARTILE.EXC) and Tukey hinges", "—", "✓"),
@@ -93,17 +93,17 @@ FREE_PRO = [
 
 FORMAT = [
     ("Style template", "Clean, Classic, Minimal, Contrast, Compact, IBCS style. A template only fills what you have not set yourself."),
-    ("Boxes", "Orientation; box colour (fx); border colour and width; box width %; rounded corners; fill opacity; median line colour; colour by quartile (Pro) with lower and upper half colours."),
+    ("Boxes", "Orientation; box colour with conditional formatting (fx) — the rule is evaluated per row, so base it on the category (a colour column or a measure that is constant within each category); colour by quartile and high contrast override it; border colour and width; box width %; rounded corners; fill opacity; median line colour; colour by quartile (Pro) with lower and upper half colours."),
     ("Whiskers", "Reach: 1.5 × IQR (Tukey), minimum to maximum, 5th–95th or 10th–90th percentile (Pro); caps; colour."),
     ("Statistics", "Quartile method (inclusive; exclusive and Tukey hinges are Pro); n under each box; median label; mean marker and colour (Pro); notches (Pro)."),
     ("Points", "Show all points (Pro); separation of the points %; size; colour; border colour and width; opacity; outlier size and colour."),
-    ("Violin", "Show violin (Pro); opacity; colour (empty = the colour of the box or group)."),
-    ("Sort", "Data order, name, or median, mean, IQR and count (Pro); descending."),
+    ("Violin", "Show violin (Pro), drawn for boxes with at least 3 values; opacity; colour (empty = the colour of the box or group)."),
+    ("Sort", "Data order, name, or median, mean, IQR and count (Pro), computed on all the rows of each category so groups and panels share the order; descending."),
     ("Reference lines", "Two lines (Pro), each with value and label; line colour."),
     ("Value axis", "Show; title and title text; gridlines; automatic range or minimum and maximum; font; bold; text size and colour."),
     ("Category axis", "Show; font; bold; text size and colour."),
     ("Legend", "Shown with a Group field; position top or bottom; text size and colour."),
-    ("Statistics table", "Show (Pro); text size and colour; header background and text colour; alternate row colour."),
+    ("Statistics table", "Show (Pro), below the chart, up to 35 % of the height with its own scroll; text size and colour; header background and text colour; alternate row colour."),
     ("Small multiples", "Columns (0 = automatic); space between panels; title size, colour, bold and alignment; panel background and border."),
     ("Background", "Colour of the whole visual."),
 ]
@@ -126,19 +126,24 @@ FAQ = [
     ("Should Value be Sum or Average?",
      "<p>With one row per ID in Detail, both give the same number per row. Use the aggregation that makes sense if an ID can have several rows.</p>"),
     ("How many rows can it use?",
-     "<p>Power BI sends the visual up to 30,000 rows at a time. In the Power BI service the visual asks for the next blocks automatically. "
-     "Power BI Desktop sends only the first block; when that happens, a warning icon in the visual header says how many rows were used. "
-     "Statistics always use every row received. With all points shown, up to about 4,000 points per box are drawn; the violin's density is "
-     "estimated from up to 2,000 values per box.</p>"),
+     "<p>Power BI sends the visual up to 30,000 rows at a time. In the Power BI service the visual asks for further blocks automatically, up "
+     "to 40 more (about 1.2 million rows). In Power BI Desktop the visual uses the first 30,000 rows and does not request more. In both cases "
+     "a warning icon in the visual header says how many rows were used when some were left out. Statistics always use every row received. "
+     "With all points shown, up to about 4,000 points per box are drawn; the violin's density is estimated from up to 2,000 values per box.</p>"),
     ("Do bookmarks keep my settings?",
      "<p>Bookmarks keep the boxes you select and the filters of the page. Like every Power BI visual, they do not keep formatting such as "
      "orientation or points. To switch between two looks, use two copies of the visual and show one or the other in each bookmark.</p>"),
     ("What is the \"Pro preview\" watermark?",
      "<p>While you edit a report without a licence, Pro features you turn on are drawn working under a watermark that names them, and Power BI "
-     "shows its licence notice. Reading view shows the free result. Nothing is lost: the settings apply as soon as a licence is active.</p>"),
+     "shows its licence notice. Reading view shows the free result, with a small note naming the Pro features it leaves out. Nothing is lost: "
+     "the settings apply as soon as a licence is active. Where Power BI provides no licence information (for example when you are not signed "
+     "in to Power BI Desktop), the free result is shown and there is no preview.</p>"),
     ("How do I get Pro?",
      "<p>On the visual's Microsoft AppSource page, choose <strong>Buy now</strong> (not Install free). Licences are per user and managed by "
      "Microsoft; restart Power BI Desktop after the licence is assigned. See <a href=\"https://tcviz.com/licensing.html\">tcviz.com/licensing</a>.</p>"),
+    ("How are numbers formatted?",
+     "<p>With the measure's number format from the model, dynamic format strings included, in the report's language. Statistics that are not "
+     "whole numbers (mean, interpolated quartiles, standard deviation) show up to two decimals when the format has none.</p>"),
     ("Is my data sent anywhere?",
      "<p>No. The visual makes no network requests and stores nothing outside your report. The links on the start screen open only when you click "
      "them, through Power BI.</p>"),
@@ -173,7 +178,7 @@ def support():
 <div class="verpill">Visual v{VERSION} &nbsp;·&nbsp; docs updated {FECHA} &nbsp;·&nbsp; <a href="changelog.html">what's new</a></div>
 
 <p class="lead">A box plot that reads well: median, quartiles, whiskers and outliers for each category, with <strong>n</strong> on every box
-and the quartile method stated. The free version is a complete, correct box plot. <strong>Pro</strong> adds points with jitter, mean and
+and the quartile method stated. The free version is a complete box plot. <strong>Pro</strong> adds points with jitter, mean and
 notches, violin, groups and small multiples, sorting by median, reference lines and a statistics table.</p>
 {video}
 <h2 id="quickstart">Quick Start</h2>
@@ -189,11 +194,34 @@ notches, violin, groups and small multiples, sorting by median, reference lines 
 
 <h2 id="read">How to read it</h2>
 <div class="card">
+<figure style="margin:0 0 14px">
+<svg viewBox="0 0 640 210" role="img" aria-label="Annotated box plot: minimum, Q1, median, Q3, maximum, outlier and interquartile range" style="width:100%;max-width:640px;display:block;margin:0 auto">
+  <g font-family="Segoe UI, sans-serif" font-size="13" fill="#535146" text-anchor="middle">
+    <line x1="70" y1="95" x2="190" y2="95" stroke="#605E5C" stroke-width="2"/>
+    <line x1="70" y1="78" x2="70" y2="112" stroke="#605E5C" stroke-width="2"/>
+    <line x1="400" y1="95" x2="510" y2="95" stroke="#605E5C" stroke-width="2"/>
+    <line x1="510" y1="78" x2="510" y2="112" stroke="#605E5C" stroke-width="2"/>
+    <rect x="190" y="68" width="210" height="54" rx="3" fill="#2B6CB0" fill-opacity="0.18" stroke="#2B6CB0" stroke-width="2"/>
+    <line x1="270" y1="68" x2="270" y2="122" stroke="#1F4E80" stroke-width="3"/>
+    <circle cx="585" cy="95" r="6" fill="#FFFFFF" stroke="#B4541C" stroke-width="2.5"/>
+    <g stroke="#B5B3AA" stroke-dasharray="3 4"><line x1="70" y1="40" x2="70" y2="70"/><line x1="190" y1="22" x2="190" y2="64"/>
+      <line x1="270" y1="40" x2="270" y2="64"/><line x1="400" y1="22" x2="400" y2="64"/><line x1="510" y1="40" x2="510" y2="70"/><line x1="585" y1="22" x2="585" y2="84"/></g>
+    <text x="70" y="34">Minimum</text><text x="190" y="16">Q1 (25%)</text><text x="270" y="34" font-weight="700" fill="#3D3929">Median</text>
+    <text x="400" y="16">Q3 (75%)</text><text x="510" y="34">Maximum</text><text x="585" y="16">Outlier</text>
+    <path d="M190 140 v8 h210 v-8" fill="none" stroke="#83827D" stroke-width="1.5"/>
+    <text x="295" y="170">Interquartile range (IQR) = Q3 − Q1</text>
+    <text x="295" y="190" fill="#83827D">the middle 50% of the values</text>
+  </g>
+</svg>
+<figcaption style="font-size:12px;color:var(--t3);text-align:center">"Minimum" and "Maximum" are the ends of the whiskers: the most extreme values that are not outliers.</figcaption>
+</figure>
+
 <p><strong>Box:</strong> the middle half of the values, from Q1 (25th percentile) to Q3 (75th). <strong>Line inside:</strong> the median.
 <strong>Whiskers:</strong> up to the last value still considered normal (by default within 1.5 × the box height). <strong>Dots beyond the
 whiskers:</strong> outliers. <strong>n:</strong> the number of rows behind the box.</p>
-<p>A tall box means a spread-out, less predictable result; a short box, a consistent one. Compare medians to see which category is
-higher, and box heights to see which is more stable.</p>
+<p>If the median is not centred in the box, the values are skewed towards the longer side. A tall box means a spread-out, less
+predictable result; a short box, a consistent one. Compare medians to see which category is higher, and box heights to see which is more
+stable. With very few values (under about 10 per box), turn on all points (Pro) to see each one.</p>
 </div>
 
 <h2 id="fields">Field Wells</h2>
@@ -221,10 +249,10 @@ Reading view shows the free result. Pro is sold per user on Microsoft AppSource.
 <h2 id="accessibility">Accessibility</h2>
 <div class="card">
 <ul>
-<li>Keyboard: Tab into the visual, arrows move between boxes, Enter or Space selects, Esc clears, the context-menu key opens the menu.</li>
+<li>Keyboard: Tab into the visual, arrows move between boxes, Home/End jump to the first/last box, Enter or Space selects, Esc clears, the context-menu key opens the menu. The tooltip opens on the focused box.</li>
 <li>Each box has a description for screen readers with its median, quartiles and n.</li>
 <li>High contrast: the visual uses the colours of the Windows contrast theme.</li>
-<li>The layout adapts to the size of the visual: axes, n labels and legend give way before the boxes do.</li>
+<li>The layout adapts to the size of the visual: axes, n labels and legend give way before the boxes do; the legend shows the groups that fit, and the start screen has three layouts.</li>
 </ul>
 </div>
 
@@ -255,7 +283,7 @@ the statistics table — happens inside Power BI, on the data of your report.</p
 <p>The visual declares <strong>no network privileges</strong> (<code>"privileges": []</code>), so Power BI does not let it make any web request.
 The icon on the start screen is bundled inside the visual.</p>
 <p>The <em>Guide</em> and <em>Product page</em> links on the start screen ask Power BI to open those pages in your browser, only when you click
-them; Power BI shows you the address and asks before opening it. The visual sends nothing.</p>
+them; Power BI opens them in your browser (Power BI Desktop asks first). The visual sends nothing.</p>
 <h2>4. Cookies and storage</h2>
 <p>No cookies and no browser storage. Formatting settings are saved in your report by Power BI, like those of any visual.</p>
 <h2>5. Licensing</h2>

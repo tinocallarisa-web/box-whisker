@@ -142,7 +142,7 @@
   "UI_ReadingFree": "閲覧ビューでは適用されない Pro 機能:",
   "UI_ProPreview": "Pro プレビュー",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop はビジュアルに最初の行だけを送ります。すべて使うにはサービスに発行してください。",
+  "UI_WarnRowsDesktop": "Power BI Desktop では、Power BI が送る最初の行だけを使います。すべて使うにはサービスに発行してください。",
   "UI_WarnRows": "Power BI は行の一部だけを送りました。箱は受け取った行を表しています。",
   "UI_Method": "四分位",
   "UI_Avg": "平均",

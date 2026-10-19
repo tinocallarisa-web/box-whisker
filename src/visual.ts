@@ -168,7 +168,8 @@ interface Box {
     cat: string; group: string | null; panel: string | null;
     values: number[];               // ordenados
     stats: BoxStats;
-    id: ISelectionId | null;
+    id: ISelectionId | null;        // la primera fila: menú contextual
+    ids: ISelectionId[];            // todas las filas de la caja: filtro, tooltip y marcadores
     ruleColor: string | null;       // color resuelto por la regla fx (formato condicional)
     tips: { name: string; value: string }[];
     seed: number;
@@ -205,6 +206,9 @@ export class Visual implements IVisual {
     private missingDetail = false;
     private focusKey = "";
     private restoredIds: ISelectionId[] = [];
+    /** Clave de identidad -> caja, para casar selecciones y marcadores sin recorrer miles de identidades. */
+    private idToBox = new Map<string, string>();
+    private keySeq = 0;
     private keyboardNav = false;
     /** Formato desde el lienzo (on-object): el clic selecciona qué formatear, no filtra datos. */
     public visualOnObjectFormatting: powerbi.extensibility.visual.VisualOnObjectFormatting;
@@ -345,7 +349,8 @@ export class Visual implements IVisual {
     }
 
     private streamSegments(options: VisualUpdateOptions, dv: DataView): boolean {
-        if ((options as any).operationKind !== 1) { this.lastFetchCount = 0; this.fetchRounds = 0; }
+        const op = (options as any).operationKind;
+        if (op !== 1 && op !== 2) { this.lastFetchCount = 0; this.fetchRounds = 0; }   // Append y Segment continúan; el resto empieza de cero
         this.truncatedAt = 0;
         if (!dv.metadata?.segment) return false;
         const loaded = dv.categorical?.categories?.[0]?.values?.length ?? 0;
@@ -414,6 +419,7 @@ export class Visual implements IVisual {
     /** Cajas a partir de las filas. false = no hay nada que dibujar (pantalla de inicio). */
     private readData(dv: DataView | undefined): boolean {
         this.boxes = []; this.cats = []; this.groups = []; this.panels = [];
+        this.idToBox.clear();
         this.missingDetail = false;
         const cats = dv?.categorical?.categories || [];
         // Con una jerarquía y "Expandir todo" llegan varias columnas con el rol: la caja es la combinación.
@@ -444,7 +450,7 @@ export class Visual implements IVisual {
         const s = this.effective();
         const method = s.method as QuartileMethod, rule = s.whiskerRule as WhiskerRule;
 
-        const by = new Map<string, { cat: string; group: string | null; panel: string | null; vals: number[]; first: number; tips: number[][] }>();
+        const by = new Map<string, { cat: string; group: string | null; panel: string | null; vals: number[]; first: number; rows: number[]; tips: number[][] }>();
         const name = (v: any) => (v === null || v === undefined || v === "") ? this.t("UI_Blank", "(Blank)") : (v instanceof Date ? v.toLocaleDateString(culture) : String(v));
         const n = catCol.values.length;
         for (let i = 0; i < n; i++) {
@@ -458,7 +464,8 @@ export class Visual implements IVisual {
             const panel = panCol ? name(panCol.values[i]) : null;
             const key = (panel ?? "") + "\u0001" + cat + "\u0001" + (group ?? "");
             let b = by.get(key);
-            if (!b) { b = { cat, group, panel, vals: [], first: i, tips: tipCols.map(() => []) }; by.set(key, b); }
+            if (!b) { b = { cat, group, panel, vals: [], first: i, rows: [], tips: tipCols.map(() => []) }; by.set(key, b); }
+            b.rows.push(i);
             b.vals.push(v);
             tipCols.forEach((tc, k) => { const x = Number(tc.values[i]); if (Number.isFinite(x)) b.tips[k].push(x); });
             if (this.cats.indexOf(cat) < 0) this.cats.push(cat);
@@ -470,10 +477,23 @@ export class Visual implements IVisual {
         let seed = 1;
         by.forEach((b, key) => {
             b.vals.sort((x, y) => x - y);
-            let builder = this.host.createSelectionIdBuilder();
-            for (const c of catCols) builder = builder.withCategory(c, b.first);
-            if (grpCol) builder = builder.withCategory(grpCol, b.first);
-            if (panCol) builder = builder.withCategory(panCol, b.first);
+            // Una identidad por fila: con Detail cada fila es una observación y, en Desktop, la identidad de categoría
+            // es de fila. Pasar solo la primera filtraba una inspección, no la planta entera.
+            const idOf = (r: number) => {
+                let builder = this.host.createSelectionIdBuilder();
+                for (const c of catCols) builder = builder.withCategory(c, r);
+                if (grpCol) builder = builder.withCategory(grpCol, r);
+                if (panCol) builder = builder.withCategory(panCol, r);
+                return builder.createSelectionId();
+            };
+            const vistos = new Set<string>();
+            const ids: ISelectionId[] = [];
+            for (const r of b.rows) {
+                const id = idOf(r);
+                const k = this.keyOf(id);
+                if (vistos.has(k)) continue;
+                vistos.add(k); ids.push(id); this.idToBox.set(k, key);
+            }
             const fx = (catCol.objects?.[b.first]?.["boxes"]?.["fill"] as any)?.solid?.color ?? null;
             const tips = tipCols.map((tc, k) => {
                 const arr = b.tips[k];
@@ -482,7 +502,7 @@ export class Visual implements IVisual {
             });
             this.boxes.push({
                 key, cat: b.cat, group: b.group, panel: b.panel, values: b.vals,
-                stats: boxStats(b.vals, method, rule), id: builder.createSelectionId(), ruleColor: fx, tips, seed: seed++,
+                stats: boxStats(b.vals, method, rule), id: ids[0] ?? null, ids, ruleColor: fx, tips, seed: seed++,
             });
         });
         this.sortCategories(s);
@@ -858,8 +878,8 @@ export class Visual implements IVisual {
             const r = Math.max(3, Math.min(6, bw / 6));
             this.el("path", { d: `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`, fill: hc.on ? hc.bg : s.meanColor, stroke: hc.on ? hc.fg : (s.template === "ibcs" ? "#262626" : "#FFFFFF"), "stroke-width": 1 }, g);
         }
-        // Outliers: siempre dibujados (si se muestran todos los puntos, ya están entre ellos)
-        if (!s.points) {
+        // Outliers: siempre dibujados, también encima de los puntos (siguen marcados con su color y tamaño)
+        {
             const r = clamp(s.outlierSize, 1, 10);
             for (const v of st.outliers) {
                 const [x, y] = P(center, vPix(v));
@@ -962,7 +982,7 @@ export class Visual implements IVisual {
         if (typeof host.displayWarningIcon !== "function") return;
         if (this.truncatedAt) {
             host.displayWarningIcon(this.t("UI_WarnTitle", "Box & Whisker"), (this.isDesktop
-                ? this.t("UI_WarnRowsDesktop", "Power BI Desktop sends a visual only the first rows: publish to the Service to use them all.")
+                ? this.t("UI_WarnRowsDesktop", "In Power BI Desktop the visual uses the first rows Power BI sends: publish to the service to use them all.")
                 : this.t("UI_WarnRows", "Power BI sent only part of the rows: the boxes reflect the rows received.")) + " (" + this.truncatedAt + ")");
         } else if (typeof host.hideWarningIcon === "function") host.hideWarningIcon();
     }
@@ -983,6 +1003,8 @@ export class Visual implements IVisual {
         });
         g.addEventListener("mousemove", (e) => this.showTooltip(b, e.clientX, e.clientY));
         g.addEventListener("mouseleave", () => this.host.tooltipService.hide({ immediately: false, isTouchEvent: false }));
+        g.addEventListener("focus", () => { const r = g.getBoundingClientRect(); this.showTooltip(b, r.left + r.width / 2, r.top); });
+        g.addEventListener("blur", () => this.host.tooltipService.hide({ immediately: true, isTouchEvent: false }));
         g.addEventListener("keydown", (e: KeyboardEvent) => {
             this.keyboardNav = true;
             const all = Array.from(this.svg.querySelectorAll<SVGGElement>("g[data-box]"));
@@ -1012,12 +1034,46 @@ export class Visual implements IVisual {
         });
     }
 
+    private keyOf(id: any): string {
+        const k = id?.getKey?.();
+        if (typeof k === "string") return k;
+        const sel = id?.getSelector?.();
+        // Sin clave ni selector no se puede deduplicar: cada identidad cuenta como distinta.
+        return sel ? JSON.stringify(sel) : "#" + (++this.keySeq);
+    }
+
+    /** Cajas seleccionadas según Power BI (clic propio o marcador restaurado). */
+    private selectedBoxes(): Set<string> {
+        const own = this.selectionManager.getSelectionIds() as ISelectionId[];
+        const sel = own.length ? own : this.restoredIds;
+        const out = new Set<string>();
+        for (const id of sel) {
+            const k = this.idToBox.get(this.keyOf(id));
+            if (k) { out.add(k); continue; }
+            // Un marcador puede devolver la identidad con otra forma que la del clic: equals/includes contra cada caja.
+            const igual = (x: any) => !!(x?.equals?.(id) || (id as any)?.equals?.(x) || (id as any)?.includes?.(x, true) || x?.includes?.(id, true));
+            const b = this.boxes.find(x => x.ids.some(igual));
+            if (b) out.add(b.key);
+        }
+        return out;
+    }
+
+    /**
+     * Clic en una caja: se selecciona con TODAS sus filas. Seleccionar una lista no alterna, así que el
+     * segundo clic sobre la única caja seleccionada se resuelve aquí con clear() (receta de Calendar).
+     */
     private select(b: Box, multi: boolean): void {
-        if (!this.canInteract || !b.id) return;
-        const sel = this.selectionManager.getSelectionIds() as ISelectionId[];
+        if (!this.canInteract || !b.ids.length) return;
+        const actual = this.selectedBoxes();
         this.restoredIds = [];
-        const same = !multi && sel.length === 1 && (sel[0] as any).equals?.(b.id);
-        (same ? this.selectionManager.clear() : this.selectionManager.select(b.id, multi)).then(() => this.paintSelection());
+        let siguiente: Box[];
+        if (multi) {
+            siguiente = this.boxes.filter(x => actual.has(x.key) !== (x.key === b.key));
+        } else {
+            siguiente = actual.size === 1 && actual.has(b.key) ? [] : [b];
+        }
+        const ids = ([] as ISelectionId[]).concat(...siguiente.map(x => x.ids));
+        (ids.length ? this.selectionManager.select(ids, false) : this.selectionManager.clear()).then(() => this.paintSelection());
     }
 
     private showTooltip(b: Box, x: number, y: number): void {
@@ -1038,7 +1094,7 @@ export class Visual implements IVisual {
             { displayName: this.t("UI_Method", "Quartiles"), value: this.methodName() },
         );
         for (const tp of b.tips) items.push({ displayName: tp.name + " (" + this.t("UI_Avg", "avg") + ")", value: tp.value });
-        this.host.tooltipService.show({ dataItems: items as any, identities: b.id ? [b.id] : [], coordinates: [x, y], isTouchEvent: false });
+        this.host.tooltipService.show({ dataItems: items as any, identities: b.ids, coordinates: [x, y], isTouchEvent: false });
     }
 
     private methodName(): string {
@@ -1049,14 +1105,10 @@ export class Visual implements IVisual {
     }
 
     private paintSelection(): void {
-        const own = this.selectionManager.getSelectionIds() as ISelectionId[];
-        const sel = own.length ? own : this.restoredIds;
-        const has = sel.length > 0;
-        // Los IDs de un marcador no siempre son el mismo objeto que los del clic: equals en los dos sentidos e includes.
-        const same = (a: any, b: any) => !!(a?.equals?.(b) || b?.equals?.(a) || a?.includes?.(b, true) || b?.includes?.(a, true));
+        const elegidas = this.selectedBoxes();
+        const has = elegidas.size > 0;
         this.svg.querySelectorAll<SVGGElement>("g[data-box]").forEach(g => {
-            const b = this.boxes.find(x => x.key === g.getAttribute("data-box"));
-            const on = !has || (!!b?.id && sel.some(s => same(s, b.id)));
+            const on = !has || elegidas.has(g.getAttribute("data-box") || "");
             g.setAttribute("opacity", on ? "1" : "0.3");
             g.setAttribute("aria-selected", has && on ? "true" : "false");
         });

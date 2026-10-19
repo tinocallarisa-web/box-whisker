@@ -142,7 +142,7 @@
   "UI_ReadingFree": "In der Leseansicht nicht angewendete Pro-Funktionen:",
   "UI_ProPreview": "Pro-Vorschau",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop sendet einem Visual nur die ersten Zeilen: Veröffentlichen Sie im Dienst, um alle zu nutzen.",
+  "UI_WarnRowsDesktop": "In Power BI Desktop verwendet das Visual die ersten Zeilen, die Power BI sendet: Veröffentlichen Sie im Dienst, um alle zu nutzen.",
   "UI_WarnRows": "Power BI hat nur einen Teil der Zeilen gesendet: Die Kästen zeigen die empfangenen Zeilen.",
   "UI_Method": "Quartile",
   "UI_Avg": "Mittel",

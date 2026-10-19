@@ -56,21 +56,21 @@ PRO
 
 • Group: boxes side by side inside each category, with a legend
 • Small multiples on a shared scale, with columns, titles and panel styles
-• All points with jitter, mean marker, notches and a violin behind each box
+• All points with jitter, mean marker, notches (approximate 95% interval of the median) and a violin behind each box
 • Colour by quartile; sort by median, mean, IQR or count
 • Exclusive quartiles (Excel QUARTILE.EXC) and Tukey hinges; whiskers at the 5th–95th or 10th–90th percentile
 • Two reference lines and a statistics table: n, min, Q1, median, Q3, max, mean, standard deviation and outliers
 
 FREE AND PRO
 
-The free version is a complete, correct box plot: every box, whisker and outlier is drawn on all the data. Pro adds ways to read and compare it. Turn on a Pro capability while editing without a licence and it is drawn working, on your own data, under a "Pro preview" watermark that names it; reading view shows the free result.
+The free version is a complete box plot with the method stated: every box, whisker and outlier is drawn on every row the visual receives — up to about 1.2 million rows in the Power BI service and the first 30,000 in Power BI Desktop, with a warning icon when rows were left out. Pro adds ways to read and compare it. Turn on a Pro capability while editing without a licence and it is drawn working, on your own data, under a "Pro preview" watermark that names it; reading view shows the free result.
 
 WORKS LIKE A NATIVE VISUAL
 
 • Click a box to filter the page by its category; Ctrl+click for several; bookmarks restore the selection
 • Drilldown on a hierarchy, Power BI context menu, standard and report tooltips
 • Keyboard navigation, screen-reader descriptions and high contrast
-• The model's number format and the report language; Format pane and texts in 12 languages
+• The measure's number format, dynamic format strings included, and the report language; Format pane and texts in 12 languages
 • Format on the canvas, and a start screen that shows the first steps
 
 PRIVACY

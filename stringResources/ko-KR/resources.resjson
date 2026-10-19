@@ -142,7 +142,7 @@
   "UI_ReadingFree": "읽기용 보기에 적용되지 않은 Pro 기능:",
   "UI_ProPreview": "Pro 미리 보기",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop은 시각적 개체에 처음 행만 보냅니다. 모두 사용하려면 서비스에 게시하세요.",
+  "UI_WarnRowsDesktop": "Power BI Desktop에서는 Power BI가 보낸 처음 행을 사용합니다. 모두 사용하려면 서비스에 게시하세요.",
   "UI_WarnRows": "Power BI가 행의 일부만 보냈습니다. 상자는 받은 행을 반영합니다.",
   "UI_Method": "사분위수",
   "UI_Avg": "평균",

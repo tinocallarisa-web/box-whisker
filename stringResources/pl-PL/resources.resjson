@@ -142,7 +142,7 @@
   "UI_ReadingFree": "Funkcje Pro niezastosowane w widoku do odczytu:",
   "UI_ProPreview": "Podgląd Pro",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop wysyła do wizualizacji tylko pierwsze wiersze: opublikuj w usłudze, aby użyć wszystkich.",
+  "UI_WarnRowsDesktop": "W Power BI Desktop wizualizacja używa pierwszych wierszy wysłanych przez Power BI: opublikuj w usłudze, aby użyć wszystkich.",
   "UI_WarnRows": "Power BI wysłał tylko część wierszy: pudełka odzwierciedlają otrzymane wiersze.",
   "UI_Method": "Kwartyle",
   "UI_Avg": "śr.",

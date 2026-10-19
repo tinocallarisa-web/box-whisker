@@ -142,7 +142,7 @@
   "UI_ReadingFree": "阅读视图中未应用的 Pro 功能：",
   "UI_ProPreview": "Pro 预览",
   "UI_WarnTitle": "Box & Whisker",
-  "UI_WarnRowsDesktop": "Power BI Desktop 只向视觉对象发送前面的行：发布到服务即可使用全部行。",
+  "UI_WarnRowsDesktop": "在 Power BI Desktop 中，视觉对象使用 Power BI 发送的前几行：发布到服务即可使用全部行。",
   "UI_WarnRows": "Power BI 只发送了部分行：箱体反映已收到的行。",
   "UI_Method": "四分位数",
   "UI_Avg": "平均",
