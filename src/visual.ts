@@ -47,6 +47,7 @@ function isOurPaidPlan(spIdentifier: unknown): boolean {
 /** Enlaces de la pantalla de inicio. ?ref= cuenta en la web las visitas que llegan desde el visual. */
 const URL_GUIDE = "https://tinocallarisa-web.github.io/box-whisker/support.html";
 const URL_PRODUCT = "https://tcviz.com/product/box-whisker/?ref=visual-boxplot";
+const URL_VIDEO = "https://www.youtube.com/watch?v=OuzwKX96w4M";
 
 // ─── Ajustes ──────────────────────────────────────────────────────────────────
 
@@ -1182,6 +1183,7 @@ export class Visual implements IVisual {
         const links: [string, string, string][] = [
             [T("Landing_Guide", "Guide"), T("Landing_GuideSub", "support page"), URL_GUIDE],
             [T("Landing_Product", "Product page"), "tcviz.com", URL_PRODUCT],
+            [T("Landing_Video", "Video"), "YouTube", URL_VIDEO],
         ];
         if (size === "s") {
             box.appendChild(mk("p", "tcbw-l-do", T("Landing_Small", "Add {cat}, {val} and {det}.").replace("{cat}", cat).replace("{val}", val).replace("{det}", det)));
@@ -1226,6 +1228,7 @@ export class Visual implements IVisual {
             box.appendChild(steps);
             const row = mk("div", "tcbw-l-inline");
             row.appendChild(link(links[0][0], links[0][2], "tcbw-l-a"));
+            row.appendChild(link(links[2][0], links[2][2], "tcbw-l-a"));
             row.appendChild(link("tcviz.com", links[1][2], "tcbw-l-a"));
             box.appendChild(row);
         }

@@ -40,11 +40,13 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    color: rgba(43, 108, 176, 0.18);
-    font-weight: 700;
+    // Visible sobre fondos grises (estilo IBCS) sin tapar las cajas: color más opaco y halo claro.
+    color: rgba(43, 108, 176, 0.42);
+    font-weight: 800;
     text-align: center;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 0.9);
     .tcbw-wm-title { text-transform: uppercase; letter-spacing: .08em; }
-    .tcbw-wm-why { font-size: .38em; font-weight: 600; margin-top: .3em; color: rgba(43, 108, 176, 0.45); max-width: 80%; }
+    .tcbw-wm-why { font-size: .4em; font-weight: 700; margin-top: .3em; color: rgba(31, 78, 128, 0.85); max-width: 80%; }
 }
 
 // Pantalla de inicio: tres tamaños según el recuadro
