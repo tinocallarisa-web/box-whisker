@@ -104,6 +104,7 @@ T = {
 "Minimal": ["Mínima", "Mínimo", "Minimal", "Minimal", "Minimale", "Minimaal", "Minimalny", "ミニマル", "极简", "미니멀"],
 "Contrast": ["Contraste", "Contraste", "Contraste", "Kontrast", "Contrasto", "Contrast", "Kontrast", "コントラスト", "对比", "대비"],
 "Compact": ["Compacta", "Compacto", "Compact", "Kompakt", "Compatto", "Compact", "Kompaktowy", "コンパクト", "紧凑", "간결"],
+"IBCS style": ["Estilo IBCS", "Estilo IBCS", "Style IBCS", "IBCS-Stil", "Stile IBCS", "IBCS-stijl", "Styl IBCS", "IBCS スタイル", "IBCS 样式", "IBCS 스타일"],
 "Vertical": ["Vertical", "Vertical", "Verticale", "Vertikal", "Verticale", "Verticaal", "Pionowa", "縦", "垂直", "세로"],
 "Horizontal": ["Horizontal", "Horizontal", "Horizontale", "Horizontal", "Orizzontale", "Horizontaal", "Pozioma", "横", "水平", "가로"],
 "1.5 × IQR (Tukey)": ["1,5 × RIC (Tukey)", "1,5 × AIQ (Tukey)", "1,5 × EIQ (Tukey)", "1,5 × IQR (Tukey)", "1,5 × IQR (Tukey)", "1,5 × IKA (Tukey)", "1,5 × IQR (Tukey)", "1.5 × IQR (Tukey)", "1.5 × IQR (Tukey)", "1.5 × IQR(Tukey)"],

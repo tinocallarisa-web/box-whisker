@@ -18,6 +18,7 @@
   "Enum_tpl_minimal": "ミニマル",
   "Enum_tpl_contrast": "コントラスト",
   "Enum_tpl_compact": "コンパクト",
+  "Enum_tpl_ibcs": "IBCS スタイル",
   "Obj_boxes": "箱",
   "Prop_boxes_orientation": "向き",
   "Enum_or_vertical": "縦",

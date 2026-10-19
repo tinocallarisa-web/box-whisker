@@ -148,6 +148,11 @@
                 "value": "compact",
                 "displayName": "Compact",
                 "displayNameKey": "Enum_tpl_compact"
+              },
+              {
+                "value": "ibcs",
+                "displayName": "IBCS style",
+                "displayNameKey": "Enum_tpl_ibcs"
               }
             ]
           }

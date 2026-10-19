@@ -18,6 +18,7 @@
   "Enum_tpl_minimal": "Minimaal",
   "Enum_tpl_contrast": "Contrast",
   "Enum_tpl_compact": "Compact",
+  "Enum_tpl_ibcs": "IBCS-stijl",
   "Obj_boxes": "Boxen",
   "Prop_boxes_orientation": "Richting",
   "Enum_or_vertical": "Verticaal",

@@ -25,7 +25,7 @@ OBJECTS = [
     ("style", "Style template", [
         ("template", "Template", E(("clean", "Enum_tpl_clean", "Clean"), ("classic", "Enum_tpl_classic", "Classic"),
                                     ("minimal", "Enum_tpl_minimal", "Minimal"), ("contrast", "Enum_tpl_contrast", "Contrast"),
-                                    ("compact", "Enum_tpl_compact", "Compact"))),
+                                    ("compact", "Enum_tpl_compact", "Compact"), ("ibcs", "Enum_tpl_ibcs", "IBCS style"))),
     ]),
     ("boxes", "Boxes", [
         ("orientation", "Orientation", E(("vertical", "Enum_or_vertical", "Vertical"), ("horizontal", "Enum_or_horizontal", "Horizontal"))),

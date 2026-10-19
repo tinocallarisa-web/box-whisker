@@ -18,6 +18,7 @@
   "Enum_tpl_minimal": "极简",
   "Enum_tpl_contrast": "对比",
   "Enum_tpl_compact": "紧凑",
+  "Enum_tpl_ibcs": "IBCS 样式",
   "Obj_boxes": "箱体",
   "Prop_boxes_orientation": "方向",
   "Enum_or_vertical": "垂直",

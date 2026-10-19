@@ -95,6 +95,10 @@ const TEMPLATES: Record<string, Partial<Settings>> = {
     minimal: { opacity: 0, border: "#83827D", borderWidth: 1, medianColor: "#2B6CB0", caps: false, grid: false, radius: 0 },
     contrast: { fill: "#1F4E80", border: "#1F4E80", medianColor: "#FFFFFF", opacity: 100, whiskerColor: "#1F4E80", outlierColor: "#B4541C" },
     compact: { width: 40, vFont: 9, cFont: 9, outlierSize: 2, borderWidth: 1 },
+    // Estética de IBCS (sobria, grises, sin adornos). Es un estilo: no afirma cumplimiento del estándar.
+    ibcs: { fill: "#4D4D4D", border: "#4D4D4D", opacity: 100, radius: 0, borderWidth: 1, medianColor: "#FFFFFF",
+        whiskerColor: "#4D4D4D", outlierColor: "#000000", grid: false, meanColor: "#FFFFFF",
+        vColor: "#262626", cColor: "#262626", legendColor: "#262626", tableColor: "#262626", violinColor: "#808080" },
 };
 
 type Objects = powerbi.DataViewObjects | undefined;
@@ -729,7 +733,20 @@ export class Visual implements IVisual {
     }
 
     private groupColor(g: string): string {
+        // Estilo IBCS: los grupos se distinguen por tonos de gris, no por colores del tema.
+        if (this.s.template === "ibcs" && this.groups.length) {
+            const greys = ["#404040", "#8C8C8C", "#BFBFBF", "#262626", "#666666", "#D9D9D9"];
+            return greys[Math.max(0, this.groups.indexOf(g)) % greys.length];
+        }
         return this.host.colorPalette.getColor(g).value;
+    }
+
+    /** true si un color de relleno es oscuro (para elegir mediana blanca o negra encima). */
+    private isDark(hex: string): boolean {
+        const m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
+        if (!m) return false;
+        const n = parseInt(m[1], 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        return (0.299 * r + 0.587 * g + 0.114 * b) < 140;
     }
 
     private drawBox(parent: SVGGElement, b: Box, s: Settings, center: number, sub: number,
@@ -803,7 +820,9 @@ export class Visual implements IVisual {
             this.el("rect", { ...r, rx: clamp(s.radius, 0, 12), fill: hc.on ? "none" : baseColor, "fill-opacity": opa, stroke, "stroke-width": bwStroke }, g);
         }
         // Mediana
-        const mc = hc.on ? hc.fg : (s.quartileColors ? "#FFFFFF" : (b.group !== null && opa >= 0.6 ? "#FFFFFF" : s.medianColor));
+        // Sobre una caja opaca, la mediana se elige por contraste: blanca en oscuro, negra en claro.
+        const mc = hc.on ? hc.fg : (s.quartileColors ? "#FFFFFF"
+            : (opa >= 0.6 && (b.group !== null || s.template === "ibcs") ? (this.isDark(baseColor) ? "#FFFFFF" : "#000000") : s.medianColor));
         const notchInset = s.notches ? bw * 0.22 : 0;
         line(P(u0 + notchInset, medp), P(u1 - notchInset, medp), mc, 2.5);
         if (s.medianLabel && bw > 14) {
@@ -816,7 +835,7 @@ export class Visual implements IVisual {
         if (s.showMean) {
             const [x, y] = P(center, vPix(st.mean));
             const r = Math.max(3, Math.min(6, bw / 6));
-            this.el("path", { d: `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`, fill: hc.on ? hc.bg : s.meanColor, stroke: hc.on ? hc.fg : "#FFFFFF", "stroke-width": 1 }, g);
+            this.el("path", { d: `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`, fill: hc.on ? hc.bg : s.meanColor, stroke: hc.on ? hc.fg : (s.template === "ibcs" ? "#262626" : "#FFFFFF"), "stroke-width": 1 }, g);
         }
         // Outliers: siempre dibujados (si se muestran todos los puntos, ya están entre ellos)
         if (!s.points) {
@@ -1322,7 +1341,8 @@ export class Visual implements IVisual {
         return { cards: [
             card("style", "Style template", [
                 dd("style", "template", "Template", s.template, [["clean", "Enum_tpl_clean", "Clean"], ["classic", "Enum_tpl_classic", "Classic"],
-                    ["minimal", "Enum_tpl_minimal", "Minimal"], ["contrast", "Enum_tpl_contrast", "Contrast"], ["compact", "Enum_tpl_compact", "Compact"]]),
+                    ["minimal", "Enum_tpl_minimal", "Minimal"], ["contrast", "Enum_tpl_contrast", "Contrast"], ["compact", "Enum_tpl_compact", "Compact"],
+                    ["ibcs", "Enum_tpl_ibcs", "IBCS style"]]),
             ]),
             card("boxes", "Boxes", [
                 dd("boxes", "orientation", "Orientation", s.orientation, [["vertical", "Enum_or_vertical", "Vertical"], ["horizontal", "Enum_or_horizontal", "Horizontal"]]),

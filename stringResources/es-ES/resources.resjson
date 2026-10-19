@@ -18,6 +18,7 @@
   "Enum_tpl_minimal": "Mínima",
   "Enum_tpl_contrast": "Contraste",
   "Enum_tpl_compact": "Compacta",
+  "Enum_tpl_ibcs": "Estilo IBCS",
   "Obj_boxes": "Cajas",
   "Prop_boxes_orientation": "Orientación",
   "Enum_or_vertical": "Vertical",
