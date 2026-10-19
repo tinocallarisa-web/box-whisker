@@ -680,7 +680,9 @@ export class Visual implements IVisual {
             if (vertical) {
                 left = tickW + titleW + 4; right = 8; pTop = panelTitleH + 8; pBottom = catLabelH + 4;
             } else {
-                left = (showC ? longestCat : 0) + 6; right = 12; pTop = panelTitleH + 6; pBottom = (showV ? fontV + 8 : 0) + (s.vTitle ? fontV + 6 : 0) + 4;
+                left = (showC ? longestCat : 0) + 6;
+                // La última marca del eje va centrada en el borde: hay que dejar sitio para la mitad de su texto.
+                right = Math.max(12, showV ? this.fmtAxis(nice.hi).length * fontV * 0.32 + 4 : 0); pTop = panelTitleH + 6; pBottom = (showV ? fontV + 8 : 0) + (s.vTitle ? fontV + 6 : 0) + 4;
             }
             const pw = Math.max(10, cellW - left - right), ph = Math.max(10, cellH - pTop - pBottom);
             const vPix = (v: number) => vertical
