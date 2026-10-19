@@ -104,7 +104,7 @@ Support: support@tcviz.com
 |---|---|
 | Offer ID | `box-whisker-tcviz` (the code expects `tino_callarisa.box-whisker-tcviz.<plan>`) |
 | Categories | Analytics; Data Visualization (or the closest available) |
-| Video | Pending — canonical URL `https://www.youtube.com/watch?v=…` only |
+| Video | https://www.youtube.com/watch?v=OuzwKX96w4M |
 | Support / documentation | https://tinocallarisa-web.github.io/box-whisker/support.html |
 | Privacy | https://tinocallarisa-web.github.io/box-whisker/privacy.html |
 | Terms | https://tinocallarisa-web.github.io/box-whisker/terms.html |

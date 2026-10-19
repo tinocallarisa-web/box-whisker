@@ -39,4 +39,5 @@ resolves keys declared in capabilities.json.
 Rendering events: one started/finished pair per update(); the licence repaint does not call
 update(). eslint (powerbi-visuals plugin) 0 errors.
 
+Video https://www.youtube.com/watch?v=OuzwKX96w4M
 Support/privacy/terms: tinocallarisa-web.github.io/box-whisker/

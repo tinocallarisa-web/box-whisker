@@ -13,7 +13,7 @@ BASE = "https://tinocallarisa-web.github.io/box-whisker/"
 REPO = "https://github.com/tinocallarisa-web/box-whisker"
 VERSION = json.load(io.open(os.path.join(ROOT, "pbiviz.json"), encoding="utf-8"))["visual"]["version"]
 FECHA = "19 October 2026"
-VIDEO = ""   # URL canónica https://www.youtube.com/watch?v=... cuando Tino grabe el vídeo
+VIDEO = "https://www.youtube.com/watch?v=OuzwKX96w4M"
 
 plantilla = io.open(os.path.join(WC, "privacy.html"), encoding="utf-8").read()
 HEAD = plantilla[:plantilla.index("<body>")]
