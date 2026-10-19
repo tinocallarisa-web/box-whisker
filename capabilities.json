@@ -824,6 +824,131 @@
               }
             }
           }
+        },
+        "headerBackground": {
+          "displayName": "Header background",
+          "displayNameKey": "Prop_statsTable_headerBackground",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "headerColor": {
+          "displayName": "Header text color",
+          "displayNameKey": "Prop_statsTable_headerColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "banding": {
+          "displayName": "Alternate row color",
+          "displayNameKey": "Prop_statsTable_banding",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "smallMultiples": {
+      "displayName": "Small multiples",
+      "displayNameKey": "Obj_smallMultiples",
+      "properties": {
+        "columns": {
+          "displayName": "Columns (0 = automatic)",
+          "displayNameKey": "Prop_smallMultiples_columns",
+          "type": {
+            "numeric": true
+          }
+        },
+        "gap": {
+          "displayName": "Space between panels",
+          "displayNameKey": "Prop_smallMultiples_gap",
+          "type": {
+            "numeric": true
+          }
+        },
+        "titleSize": {
+          "displayName": "Title size",
+          "displayNameKey": "Prop_smallMultiples_titleSize",
+          "type": {
+            "numeric": true
+          }
+        },
+        "titleColor": {
+          "displayName": "Title color",
+          "displayNameKey": "Prop_smallMultiples_titleColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "titleBold": {
+          "displayName": "Bold title",
+          "displayNameKey": "Prop_smallMultiples_titleBold",
+          "type": {
+            "bool": true
+          }
+        },
+        "titleAlign": {
+          "displayName": "Title alignment",
+          "displayNameKey": "Prop_smallMultiples_titleAlign",
+          "type": {
+            "enumeration": [
+              {
+                "value": "left",
+                "displayName": "Left",
+                "displayNameKey": "Enum_al_left"
+              },
+              {
+                "value": "center",
+                "displayName": "Center",
+                "displayNameKey": "Enum_al_center"
+              }
+            ]
+          }
+        },
+        "background": {
+          "displayName": "Panel background",
+          "displayNameKey": "Prop_smallMultiples_background",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "border": {
+          "displayName": "Panel border",
+          "displayNameKey": "Prop_smallMultiples_border",
+          "type": {
+            "bool": true
+          }
+        },
+        "borderColor": {
+          "displayName": "Panel border color",
+          "displayNameKey": "Prop_smallMultiples_borderColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
         }
       }
     },

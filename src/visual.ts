@@ -63,7 +63,9 @@ interface Settings {
     vFont: number; vColor: string; vFamily: string; vBold: boolean;
     cAxis: boolean; cFont: number; cColor: string; cFamily: string; cBold: boolean;
     legend: boolean; legendPos: string; legendFont: number; legendColor: string;
-    table: boolean; tableFont: number; tableColor: string;
+    table: boolean; tableFont: number; tableColor: string; tableHeaderBg: string; tableHeaderColor: string; tableBanding: string;
+    smCols: number; smGap: number; smTitleSize: number; smTitleColor: string; smTitleBold: boolean; smTitleAlign: string;
+    smBackground: string; smBorder: boolean; smBorderColor: string;
     background: string;
 }
 
@@ -81,7 +83,9 @@ const DEFAULTS: Settings = {
     vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C", vFamily: "", vBold: false,
     cAxis: true, cFont: 11, cColor: "#605E5C", cFamily: "", cBold: false,
     legend: true, legendPos: "top", legendFont: 11, legendColor: "#605E5C",
-    table: false, tableFont: 11, tableColor: "#3D3929",
+    table: false, tableFont: 11, tableColor: "#3D3929", tableHeaderBg: "#F3F2F1", tableHeaderColor: "", tableBanding: "",
+    smCols: 0, smGap: 8, smTitleSize: 12, smTitleColor: "#3D3929", smTitleBold: true, smTitleAlign: "left",
+    smBackground: "", smBorder: false, smBorderColor: "#E1DFDD",
     background: "",
 };
 
@@ -144,6 +148,13 @@ function readSettings(objects: Objects): Settings {
         legendFont: pick("legend", "fontSize", "legendFont"), legendColor: pick("legend", "color", "legendColor"),
         table: pick("statsTable", "show", "table"), tableFont: pick("statsTable", "fontSize", "tableFont"),
         tableColor: pick("statsTable", "color", "tableColor"),
+        tableHeaderBg: pick("statsTable", "headerBackground", "tableHeaderBg"), tableHeaderColor: pick("statsTable", "headerColor", "tableHeaderColor"),
+        tableBanding: pick("statsTable", "banding", "tableBanding"),
+        smCols: pick("smallMultiples", "columns", "smCols"), smGap: pick("smallMultiples", "gap", "smGap"),
+        smTitleSize: pick("smallMultiples", "titleSize", "smTitleSize"), smTitleColor: pick("smallMultiples", "titleColor", "smTitleColor"),
+        smTitleBold: pick("smallMultiples", "titleBold", "smTitleBold"), smTitleAlign: pick("smallMultiples", "titleAlign", "smTitleAlign"),
+        smBackground: pick("smallMultiples", "background", "smBackground"), smBorder: pick("smallMultiples", "border", "smBorder"),
+        smBorderColor: pick("smallMultiples", "borderColor", "smBorderColor"),
         background: pick("background", "color", "background"),
     };
 }
@@ -620,17 +631,27 @@ export class Visual implements IVisual {
         const longestCat = Math.min(160, Math.max(0, ...this.cats.map(c => c.length)) * fontC * 0.58 + 10);
 
         const panels = this.panels.length ? this.panels : [null];
-        const cols = panels.length === 1 ? 1 : Math.max(1, Math.round(Math.sqrt(panels.length * (W / Math.max(1, H)))));
+        const autoCols = Math.max(1, Math.round(Math.sqrt(panels.length * (W / Math.max(1, H)))));
+        const cols = panels.length === 1 ? 1 : Math.min(panels.length, s.smCols > 0 ? Math.round(s.smCols) : autoCols);
         const rows = Math.ceil(panels.length / cols);
-        const panelTitleH = panels[0] !== null ? fontC + 8 : 0;
+        const smTitle = clamp(s.smTitleSize, 6, 40);
+        const panelTitleH = panels[0] !== null ? smTitle + 8 : 0;
+        const gap = panels[0] !== null ? clamp(s.smGap, 0, 60) : 0;
         const plotW = W, plotH = H - top - bottom;
-        const cellW = plotW / cols, cellH = plotH / rows;
+        const cellW = (plotW - gap * (cols - 1)) / cols, cellH = (plotH - gap * (rows - 1)) / rows;
 
         panels.forEach((panel, pi) => {
-            const cx = (pi % cols) * cellW, cy = top + Math.floor(pi / cols) * cellH;
+            const cx = (pi % cols) * (cellW + gap), cy = top + Math.floor(pi / cols) * (cellH + gap);
             const g = this.el("g", { transform: `translate(${cx},${cy})` }, this.svg);
             if (panel !== null) {
-                const t = this.el("text", { x: 6, y: fontC + 2, "font-size": fontC + 1, "font-weight": 600, fill: hc.on ? hc.fg : "#3D3929" }, g);
+                if ((s.smBackground && !hc.on) || s.smBorder) {
+                    this.el("rect", { x: 0.5, y: 0.5, width: Math.max(0, cellW - 1), height: Math.max(0, cellH - 1), rx: 2,
+                        fill: s.smBackground && !hc.on ? s.smBackground : "none",
+                        stroke: s.smBorder ? (hc.on ? hc.fg : s.smBorderColor) : "none", "stroke-width": 1 }, g);
+                }
+                const center = s.smTitleAlign === "center";
+                const t = this.el("text", { x: center ? cellW / 2 : 6, y: smTitle + 2, "text-anchor": center ? "middle" : "start",
+                    "font-size": smTitle, "font-weight": s.smTitleBold ? 600 : 400, fill: hc.on ? hc.fg : s.smTitleColor }, g);
                 t.textContent = panel;
             }
             let left: number, right: number, pTop: number, pBottom: number;
@@ -879,12 +900,19 @@ export class Visual implements IVisual {
             .concat(["n", this.t("UI_Min", "Min"), "Q1", this.t("UI_Median", "Median"), "Q3", this.t("UI_Max", "Max"),
                 this.t("UI_Mean", "Mean"), this.t("UI_SD", "Std dev"), this.t("UI_Outliers", "Outliers")]);
         const firstNum = 1 + (this.groups.length ? 1 : 0) + (this.panels.length ? 1 : 0);
-        cols.forEach((c, i) => { const th = document.createElement("th"); th.textContent = c; if (i >= firstNum) th.className = "num"; head.appendChild(th); });
+        cols.forEach((c, i) => {
+            const th = document.createElement("th"); th.textContent = c; if (i >= firstNum) th.className = "num";
+            // Fondo propio: la cabecera queda fija al desplazar y sin fondo dejaría ver las filas por debajo.
+            th.style.background = hc.on ? hc.bg : (s.tableHeaderBg || "#FFFFFF");
+            th.style.color = hc.on ? hc.fg : (s.tableHeaderColor || s.tableColor || "#3D3929");
+            head.appendChild(th);
+        });
         const thead = document.createElement("thead"); thead.appendChild(head); table.appendChild(thead);
         const tbody = document.createElement("tbody");
         for (const cat of this.cats) {
             for (const b of this.boxes.filter(x => x.cat === cat)) {
                 const st = b.stats, tr = document.createElement("tr");
+                if (s.tableBanding && !hc.on && tbody.childElementCount % 2 === 1) tr.style.background = s.tableBanding;
                 const cells = [b.cat].concat(this.groups.length ? [b.group ?? ""] : []).concat(this.panels.length ? [b.panel ?? ""] : [])
                     .concat([st.n.toLocaleString((this.host as any).locale), this.fmt(st.min), this.fmt(st.q1), this.fmt(st.median), this.fmt(st.q3),
                         this.fmt(st.max), this.fmt(st.mean), this.fmt(st.sd), String(st.outliers.length)]);
@@ -1432,6 +1460,20 @@ export class Visual implements IVisual {
                 tog("statsTable", "show", "Show table (Pro)", s.table),
                 num("statsTable", "fontSize", "Text size", s.tableFont),
                 col("statsTable", "color", "Text color", s.tableColor),
+                col("statsTable", "headerBackground", "Header background", s.tableHeaderBg),
+                col("statsTable", "headerColor", "Header text color", s.tableHeaderColor),
+                col("statsTable", "banding", "Alternate row color", s.tableBanding),
+            ]),
+            card("smallMultiples", "Small multiples", [
+                num("smallMultiples", "columns", "Columns (0 = automatic)", s.smCols),
+                num("smallMultiples", "gap", "Space between panels", s.smGap),
+                num("smallMultiples", "titleSize", "Title size", s.smTitleSize),
+                col("smallMultiples", "titleColor", "Title color", s.smTitleColor),
+                tog("smallMultiples", "titleBold", "Bold title", s.smTitleBold),
+                dd("smallMultiples", "titleAlign", "Title alignment", s.smTitleAlign, [["left", "Enum_al_left", "Left"], ["center", "Enum_al_center", "Center"]]),
+                col("smallMultiples", "background", "Panel background", s.smBackground),
+                tog("smallMultiples", "border", "Panel border", s.smBorder),
+                col("smallMultiples", "borderColor", "Panel border color", s.smBorderColor),
             ]),
             card("background", "Background", [
                 col("background", "color", "Color", s.background),
