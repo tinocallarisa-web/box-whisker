@@ -909,8 +909,12 @@ export class Visual implements IVisual {
         });
         const thead = document.createElement("thead"); thead.appendChild(head); table.appendChild(thead);
         const tbody = document.createElement("tbody");
+        // Mismo orden que el gráfico: categoría, luego panel y grupo en el orden en que se dibujan.
+        const pIdx = (v: string | null) => v === null ? 0 : this.panels.indexOf(v);
+        const gIdx = (v: string | null) => v === null ? 0 : this.groups.indexOf(v);
         for (const cat of this.cats) {
-            for (const b of this.boxes.filter(x => x.cat === cat)) {
+            const delCat = this.boxes.filter(x => x.cat === cat).sort((x, y) => pIdx(x.panel) - pIdx(y.panel) || gIdx(x.group) - gIdx(y.group));
+            for (const b of delCat) {
                 const st = b.stats, tr = document.createElement("tr");
                 if (s.tableBanding && !hc.on && tbody.childElementCount % 2 === 1) tr.style.background = s.tableBanding;
                 const cells = [b.cat].concat(this.groups.length ? [b.group ?? ""] : []).concat(this.panels.length ? [b.panel ?? ""] : [])
