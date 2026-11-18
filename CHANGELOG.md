@@ -8,6 +8,7 @@ All notable changes to Box & Whisker by TCViz. Power BI four-part version number
 - New Accessibility card in the Format pane: high contrast (Automatic or On), colour and width of the keyboard focus, and a minimum text size for the chart and the statistics table.
 - Fix: a fixed box colour chosen next to the fx button is now kept as one colour for the whole visual and shown in the Format pane; every card has Reset to default.
 - The Pro preview watermark is now the same as in the other TCViz visuals.
+- Style templates are now the seven styles of the TCViz collection, the same as in Treemap and Line Chart: Report theme (default, follows the report theme) plus Boardroom, Ledger, Editorial, Signal, Aurora and Terrace — all free. Reports saved with a 1.0.0 template open with the closest new style: Classic → Editorial, Contrast → Boardroom, IBCS style → Signal, Clean, Minimal and Compact → Report theme, keeping their box widths, corners and gridlines.
 
 ## 1.0.0.0 — 2026-10-19
 

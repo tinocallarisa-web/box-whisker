@@ -50,7 +50,7 @@ READ IT AT A GLANCE
 • n under every box, so a box built on 12 rows is not mistaken for one built on 12,000
 • Whiskers at 1.5 × IQR (Tukey) or minimum to maximum
 • Quartiles with the inclusive method, the same as Excel QUARTILE.INC; the method is named in every tooltip
-• Vertical or horizontal; six style templates, including an IBCS style
+• Vertical or horizontal; Report theme or six collection styles (Boardroom, Ledger, Editorial, Signal, Aurora, Terrace), all free
 
 PRO
 

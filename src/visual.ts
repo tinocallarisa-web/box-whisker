@@ -78,46 +78,94 @@ const DEFAULTS: Settings = {
     template: "clean",
     orientation: "vertical", fill: "#2B6CB0", border: "#2B6CB0", borderWidth: 1.5, width: 55, radius: 2, opacity: 30,
     quartileColors: false, lowerColor: "#88C0D0", upperColor: "#5E81AC", medianColor: "#1F4E80",
-    whiskerRule: "tukey", caps: true, whiskerColor: "#605E5C",
+    whiskerRule: "tukey", caps: true, whiskerColor: "",
     method: "linear", showN: true, medianLabel: false, showMean: false, meanColor: "#3E9C5B", notches: false,
     points: false, jitter: 60, pointSize: 2.5, pointColor: "#3D3929", pointBorderColor: "#FFFFFF", pointBorderWidth: 0,
     pointOpacity: 45, outlierSize: 3, outlierColor: "#B4541C",
     violin: false, violinOpacity: 18, violinColor: "",
     sortBy: "data", descending: false,
     ref1: false, ref1Value: 0, ref1Label: "", refColor: "#B4541C", ref2: false, ref2Value: 0, ref2Label: "",
-    vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "#605E5C", vFamily: "", vBold: false,
-    cAxis: true, cFont: 11, cColor: "#605E5C", cFamily: "", cBold: false,
-    legend: true, legendPos: "top", legendFont: 11, legendColor: "#605E5C",
-    table: false, tableFont: 11, tableColor: "#3D3929", tableHeaderBg: "#F3F2F1", tableHeaderColor: "", tableBanding: "",
-    smCols: 0, smGap: 8, smTitleSize: 12, smTitleColor: "#3D3929", smTitleBold: true, smTitleAlign: "left",
+    vAxis: true, vTitle: false, vTitleText: "", grid: true, vAuto: true, vMin: 0, vMax: 100, vFont: 11, vColor: "", vFamily: "", vBold: false,
+    cAxis: true, cFont: 11, cColor: "", cFamily: "", cBold: false,
+    legend: true, legendPos: "top", legendFont: 11, legendColor: "",
+    table: false, tableFont: 11, tableColor: "", tableHeaderBg: "#F3F2F1", tableHeaderColor: "", tableBanding: "",
+    smCols: 0, smGap: 8, smTitleSize: 12, smTitleColor: "", smTitleBold: true, smTitleAlign: "left",
     smBackground: "", smBorder: false, smBorderColor: "#E1DFDD",
     // Accesibilidad: por defecto, lo mismo que la 1.0.0 (alto contraste de Windows, foco azul de 2 px, sin mínimo
     // por encima del 6 que ya imponía el dibujo). Subir el mínimo agranda todos los textos del gráfico.
     hcMode: "auto", focusColor: "#1F4E80", focusWidth: 2, minText: 6,
     background: "",
 };
+// Report theme: ejes, bigotes, leyenda, tabla y títulos de panel vacíos = la tinta del tema del informe (inkMain/inkDim),
+// que con el tema por defecto es la misma de la 1.0.0 (#605E5C). El color de la caja no cambia (#2B6CB0).
 
 /**
- * Plantillas: un punto de partida. Solo rellenan lo que el usuario no ha tocado: un ajuste escrito
- * a mano (presente en metadata.objects) gana siempre a la plantilla.
+ * Estilos: los mismos siete de la colección (Treemap, Line Chart, KPI Card, Pareto, Histogram), con los mismos tokens,
+ * para que una página en Boardroom se vea como un solo informe. "clean" = Report theme (por defecto): textos y tinta
+ * del tema del informe. En este visual los siete son GRATIS: sin "(Pro)", sin vista previa ni marca de agua.
+ * Una plantilla solo rellena lo que el usuario no ha tocado: un ajuste escrito a mano (presente en metadata.objects)
+ * gana siempre. Alto contraste manda sobre el estilo (computeLook devuelve null).
  */
-const TEMPLATES: Record<string, Partial<Settings>> = {
-    clean: {},
-    classic: { fill: "#FFFFFF", border: "#3D3929", medianColor: "#3D3929", opacity: 100, radius: 0, whiskerColor: "#3D3929", borderWidth: 1 },
-    minimal: { opacity: 0, border: "#83827D", borderWidth: 1, medianColor: "#2B6CB0", caps: false, grid: false, radius: 0 },
-    contrast: { fill: "#1F4E80", border: "#1F4E80", medianColor: "#FFFFFF", opacity: 100, whiskerColor: "#1F4E80", outlierColor: "#B4541C" },
-    compact: { width: 40, vFont: 9, cFont: 9, outlierSize: 2, borderWidth: 1 },
-    // Estética de IBCS (sobria, grises, sin adornos). Es un estilo: no afirma cumplimiento del estándar.
-    ibcs: { fill: "#4D4D4D", border: "#4D4D4D", opacity: 100, radius: 0, borderWidth: 1, medianColor: "#FFFFFF",
-        whiskerColor: "#4D4D4D", outlierColor: "#000000", grid: false, meanColor: "#FFFFFF",
-        vColor: "#262626", cColor: "#262626", legendColor: "#262626", tableColor: "#262626", violinColor: "#808080" },
+const COLLECTION_STYLES = ["boardroom", "ledger", "editorial", "signal", "aurora", "terrace"];
+interface StyleTokens { bg: string; text: string; axis: string; grid: string; plan: string; up: string; down: string; series: string[]; font?: string; grad?: string; }
+const STYLE_TOKENS: Record<string, StyleTokens> = {
+    boardroom: { bg: "#16263D", text: "#F2F0E8", axis: "#9FB0C6", grid: "#2A3E5C", plan: "#6FCF97", up: "#6FCF97", down: "#EB8A7B", series: ["#C9A45C", "#8FB8E8", "#EB8A7B", "#6FCF97", "#C5D3E3"] },
+    ledger: { bg: "#FBF8EF", text: "#231F16", axis: "#6E6652", grid: "#D9D2BE", plan: "#946A10", up: "#2F6B3B", down: "#A32A2A", series: ["#7A1F1F", "#3A3528", "#2F6B3B", "#946A10", "#B7AD92"], font: "Georgia, serif" },
+    editorial: { bg: "#FFFFFF", text: "#111111", axis: "#5F5F5F", grid: "#E2E2E2", plan: "#111111", up: "#111111", down: "#D7263D", series: ["#D7263D", "#111111", "#5F5F5F", "#BDBDBD", "#8C1C2B"], font: "Georgia, serif" },
+    signal: { bg: "#FFFFFF", text: "#14202B", axis: "#566472", grid: "#D9DEE4", plan: "#B7791F", up: "#1F7A4D", down: "#C0392B", series: ["#1F7A4D", "#14202B", "#B7791F", "#C0392B", "#9AA5B1"] },
+    aurora: { bg: "#10395E", text: "#FFFFFF", axis: "#C5D3E3", grid: "#3A5C7E", plan: "#FFD27D", up: "#7CE7D0", down: "#FF9DB0", series: ["#7CE7D0", "#FFD27D", "#FF9DB0", "#9DB7FF", "#C5D3E3"], grad: "linear-gradient(135deg, #1B1147, #10395E 50%, #0B5A5E)" },
+    terrace: { bg: "#FBF5EC", text: "#3A2A1E", axis: "#7A6450", grid: "#E5D6C2", plan: "#5E7128", up: "#5E7128", down: "#B5372A", series: ["#B5532A", "#5E7128", "#B5782A", "#B5372A", "#C9A77E"] },
+};
+
+/** Distancia RGB entre dos colores #RRGGBB (para no pintar los atípicos del mismo color que la caja). */
+function colorDist(a: string, b: string): number {
+    const p = (h: string) => { const n = parseInt(h.replace("#", ""), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+    const x = p(a), y = p(b);
+    return Math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2);
+}
+
+const TEMPLATES: Record<string, Partial<Settings>> = { clean: {} };
+for (const k of COLLECTION_STYLES) {
+    const t = STYLE_TOKENS[k];
+    // Caja = la serie principal (series[0], como la línea real del Line Chart); mediana y puntos con la tinta del estilo;
+    // media con el color del plan; atípicos con "down" salvo que se confunda con la caja (Editorial, Ledger, Terrace).
+    TEMPLATES[k] = {
+        fill: t.series[0], border: t.series[0], medianColor: t.text, lowerColor: t.series[1], upperColor: t.series[0],
+        whiskerColor: t.axis, meanColor: t.plan, pointColor: t.text, pointBorderColor: t.bg,
+        outlierColor: colorDist(t.down, t.series[0]) < 60 ? t.text : t.down,
+        refColor: t.axis, vColor: t.axis, cColor: t.axis, legendColor: t.axis,
+        tableColor: t.text, tableHeaderBg: t.grid, tableHeaderColor: t.text,
+        smTitleColor: t.axis, smBorderColor: t.grid, focusColor: t.plan,
+    };
+}
+
+/**
+ * Compatibilidad 1.0.0: las seis plantillas propias de la primera versión ya no se ofrecen. Un informe guardado con
+ * una de ellas se lee como el estilo nuevo más parecido; el color pasa a ser el del estilo y se conserva la geometría
+ * de la plantilla antigua (anchos, radios, rejilla, tamaños), para que el informe no cambie de forma:
+ *   classic  (caja blanca, trazo oscuro, sobria)       → editorial   + esquinas rectas, borde 1
+ *   minimal  (solo contorno, sin remates ni rejilla)   → clean       + contorno sin relleno, sin remates ni rejilla
+ *   contrast (cajas azul marino macizas)               → boardroom
+ *   compact  (cajas estrechas, textos de 9)            → clean       + la misma densidad
+ *   ibcs     (grises sobrios, sin rejilla, sans-serif) → signal      + esquinas rectas, borde 1, sin rejilla
+ * El valor guardado no se reescribe (nunca persistProperties al leer): el panel muestra el estilo nuevo y, si el
+ * usuario elige otro, se guarda ese.
+ */
+const LEGACY_TEMPLATES: Record<string, { style: string; keep: Partial<Settings> }> = {
+    classic: { style: "editorial", keep: { radius: 0, borderWidth: 1 } },
+    minimal: { style: "clean", keep: { opacity: 0, borderWidth: 1, caps: false, grid: false, radius: 0 } },
+    contrast: { style: "boardroom", keep: {} },
+    compact: { style: "clean", keep: { width: 40, vFont: 9, cFont: 9, outlierSize: 2, borderWidth: 1 } },
+    ibcs: { style: "signal", keep: { radius: 0, borderWidth: 1, grid: false } },
 };
 
 type Objects = powerbi.DataViewObjects | undefined;
 
 function readSettings(objects: Objects): Settings {
-    const tplName = (objects?.["style"]?.["template"] as string) || DEFAULTS.template;
-    const tpl = TEMPLATES[tplName] || {};
+    const raw = String((objects?.["style"]?.["template"] as string) || DEFAULTS.template);
+    const legacy = LEGACY_TEMPLATES[raw];
+    const tplName = legacy ? legacy.style : (TEMPLATES[raw] ? raw : DEFAULTS.template);
+    const tpl: Partial<Settings> = { ...TEMPLATES[tplName], ...(legacy?.keep || {}) };
     const pick = <K extends keyof Settings>(obj: string, prop: string, key: K): Settings[K] => {
         const raw = objects?.[obj]?.[prop];
         if (raw !== undefined && raw !== null) {
@@ -389,6 +437,12 @@ export class Visual implements IVisual {
         return this.isPro || this.isPreview();
     }
 
+    /** El usuario ha escrito este ajuste (no es el valor por defecto ni el de la plantilla). */
+    private isSet(obj: string, prop: string): boolean {
+        const v = this.lastDv?.metadata?.objects?.[obj]?.[prop];
+        return v !== undefined && v !== null;
+    }
+
     private roleBound(role: string): boolean {
         return !!this.lastDv?.categorical?.categories?.some(c => c.source.roles?.[role]);
     }
@@ -611,6 +665,24 @@ export class Visual implements IVisual {
             sel: sys ? (p?.foregroundSelected?.value || p?.foreground?.value || "#000000") : "#000000" };
     }
 
+    /** Tokens del estilo de la colección que se dibuja (null con Report theme o alto contraste). Se calcula una vez por dibujo. */
+    private look(): StyleTokens | null { return this.curLook; }
+    private curLook: StyleTokens | null = null;
+    private computeLook(): StyleTokens | null {
+        const t = this.s.template;
+        return !this.hc().on && COLLECTION_STYLES.indexOf(t) >= 0 ? STYLE_TOKENS[t] : null;
+    }
+
+    /** Tinta principal y secundaria: la del estilo, o la del tema del informe. */
+    private inkMain(): string {
+        const p: any = this.host.colorPalette;
+        return this.look()?.text ?? p?.foreground?.value ?? "#252423";
+    }
+    private inkDim(): string {
+        const p: any = this.host.colorPalette;
+        return this.look()?.axis ?? p?.foregroundNeutralSecondary?.value ?? "#605E5C";
+    }
+
     /** Tamaño mínimo de texto de la tarjeta Accesibilidad. */
     private get minT(): number {
         return clamp(this.s.minText, 6, 24);
@@ -620,7 +692,15 @@ export class Visual implements IVisual {
     private draw(): void {
         if (this.destroyed || !this.lastOptions) return;
         const vp = this.lastOptions.viewport;
-        this.root.style.background = this.hc().on ? this.hc().bg : (this.s.background || "transparent");
+        this.curLook = this.hasData ? this.computeLook() : null;
+        const look = this.curLook;
+        // Con un estilo de la colección manda su fondo: el tema del informe rellena "background" en todos los visuales
+        // (visualStyles "*") y no se distingue de un color puesto a mano.
+        this.root.style.background = this.hc().on ? this.hc().bg : (look ? (look.grad ?? look.bg) : (this.s.background || "transparent"));
+        this.root.style.fontFamily = look?.font ?? "";
+        const grid = look?.grid ?? "#E1DFDD";
+        this.root.style.setProperty("--tcbw-rule", grid);
+        this.root.style.setProperty("--tcbw-rule2", look?.grid ?? "#EDEBE9");
         this.subSelectable(this.root, "background", this.t("Obj_background", "Background"), powerbi.visuals.SubSelectionStylesType.Shape);
         if (!this.hasData) {
             this.clearSvg(); this.tableEl.style.display = "none"; this.noteEl.style.display = "none";
@@ -668,7 +748,7 @@ export class Visual implements IVisual {
             this.groups.forEach(g => {
                 if (x > W - 40) return;
                 this.el("rect", { x, y: y - fl * 0.45, width: fl * 0.9, height: fl * 0.9, rx: 2, fill: hc.on ? hc.fg : this.groupColor(g) }, lg);
-                const t = this.el("text", { x: x + fl * 0.9 + 5, y: y + fl * 0.35, "font-size": fl, fill: hc.on ? hc.fg : s.legendColor }, lg);
+                const t = this.el("text", { x: x + fl * 0.9 + 5, y: y + fl * 0.35, "font-size": fl, fill: hc.on ? hc.fg : (s.legendColor || this.inkDim()) }, lg);
                 t.textContent = g;
                 x += fl * 0.9 + 18 + Math.min(160, g.length * fl * 0.6);
             });
@@ -731,7 +811,7 @@ export class Visual implements IVisual {
                 }
                 const center = s.smTitleAlign === "center";
                 const t = this.el("text", { x: center ? cellW / 2 : 6, y: smTitle + 2, "text-anchor": center ? "middle" : "start",
-                    "font-size": smTitle, "font-weight": s.smTitleBold ? 600 : 400, fill: hc.on ? hc.fg : s.smTitleColor }, g);
+                    "font-size": smTitle, "font-weight": s.smTitleBold ? 600 : 400, fill: hc.on ? hc.fg : (s.smTitleColor || this.inkMain()) }, g);
                 t.textContent = panel;
             }
             let left: number, right: number, pTop: number, pBottom: number;
@@ -760,20 +840,20 @@ export class Visual implements IVisual {
                 const p = vPix(tv);
                 if (s.grid) {
                     const [x1, y1] = P(vertical ? left : pTop, p), [x2, y2] = P(vertical ? left + pw : pTop + ph, p);
-                    this.el("line", { x1, y1, x2, y2, stroke: hc.on ? hc.fg : "#E1DFDD", "stroke-width": 1, "stroke-opacity": hc.on ? 0.4 : 1 }, axis);
+                    this.el("line", { x1, y1, x2, y2, stroke: hc.on ? hc.fg : (this.look()?.grid ?? "#E1DFDD"), "stroke-width": 1, "stroke-opacity": hc.on ? 0.4 : 1 }, axis);
                 }
                 if (showV) {
                     const t = vertical
-                        ? this.el("text", { x: left - 6, y: p + fontV * 0.35, "text-anchor": "end", "font-size": fontV, fill: hc.on ? hc.fg : s.vColor }, axis)
-                        : this.el("text", { x: p, y: pTop + ph + fontV + 4, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : s.vColor }, axis);
+                        ? this.el("text", { x: left - 6, y: p + fontV * 0.35, "text-anchor": "end", "font-size": fontV, fill: hc.on ? hc.fg : (s.vColor || this.inkDim()) }, axis)
+                        : this.el("text", { x: p, y: pTop + ph + fontV + 4, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : (s.vColor || this.inkDim()) }, axis);
                     t.textContent = this.fmtAxis(tv);
                 }
             }
             if (showV && s.vTitle) {
                 const txt = s.vTitleText || this.valueName;
                 const t = vertical
-                    ? this.el("text", { x: 0, y: 0, transform: `translate(${fontV},${pTop + ph / 2}) rotate(-90)`, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : s.vColor }, axis)
-                    : this.el("text", { x: left + pw / 2, y: pTop + ph + fontV * 2 + 8, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : s.vColor }, axis);
+                    ? this.el("text", { x: 0, y: 0, transform: `translate(${fontV},${pTop + ph / 2}) rotate(-90)`, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : (s.vColor || this.inkDim()) }, axis)
+                    : this.el("text", { x: left + pw / 2, y: pTop + ph + fontV * 2 + 8, "text-anchor": "middle", "font-size": fontV, fill: hc.on ? hc.fg : (s.vColor || this.inkDim()) }, axis);
                 t.textContent = txt;
             }
 
@@ -801,18 +881,18 @@ export class Visual implements IVisual {
                 const nTotal = this.boxes.filter(b => b.cat === cat && b.panel === panel).reduce((a, b) => a + b.stats.n, 0);
                 if (vertical) {
                     const maxChars = Math.max(3, Math.floor(band / (fontC * 0.58)));
-                    const t = this.el("text", { x: mid, y: pTop + ph + fontC + 4, "text-anchor": "middle", "font-size": fontC, fill: hc.on ? hc.fg : s.cColor }, caxis);
+                    const t = this.el("text", { x: mid, y: pTop + ph + fontC + 4, "text-anchor": "middle", "font-size": fontC, fill: hc.on ? hc.fg : (s.cColor || this.inkDim()) }, caxis);
                     t.textContent = cat.length > maxChars ? cat.slice(0, maxChars - 1) + "…" : cat;
                     if (showN && nTotal) {
-                        const tn = this.el("text", { x: mid, y: pTop + ph + 2 * fontC + 6, "text-anchor": "middle", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
+                        const tn = this.el("text", { x: mid, y: pTop + ph + 2 * fontC + 6, "text-anchor": "middle", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : (this.look()?.axis ?? "#83827D") }, caxis);
                         tn.textContent = "n = " + nTotal.toLocaleString((this.host as any).locale);
                     }
                 } else {
                     const maxChars = Math.max(3, Math.floor((left - 10) / (fontC * 0.58)));
-                    const t = this.el("text", { x: left - 6, y: mid + (showN ? -1 : fontC * 0.35), "text-anchor": "end", "font-size": fontC, fill: hc.on ? hc.fg : s.cColor }, caxis);
+                    const t = this.el("text", { x: left - 6, y: mid + (showN ? -1 : fontC * 0.35), "text-anchor": "end", "font-size": fontC, fill: hc.on ? hc.fg : (s.cColor || this.inkDim()) }, caxis);
                     t.textContent = cat.length > maxChars ? cat.slice(0, maxChars - 1) + "…" : cat;
                     if (showN && nTotal && band > fontC * 2.2) {
-                        const tn = this.el("text", { x: left - 6, y: mid + fontC, "text-anchor": "end", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
+                        const tn = this.el("text", { x: left - 6, y: mid + fontC, "text-anchor": "end", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : (this.look()?.axis ?? "#83827D") }, caxis);
                         tn.textContent = "n = " + nTotal.toLocaleString((this.host as any).locale);
                     }
                 }
@@ -836,11 +916,9 @@ export class Visual implements IVisual {
     }
 
     private groupColor(g: string): string {
-        // Estilo IBCS: los grupos se distinguen por tonos de gris, no por colores del tema.
-        if (this.s.template === "ibcs" && this.groups.length) {
-            const greys = ["#404040", "#8C8C8C", "#BFBFBF", "#262626", "#666666", "#D9D9D9"];
-            return greys[Math.max(0, this.groups.indexOf(g)) % greys.length];
-        }
+        // Con un estilo de la colección, los grupos toman su serie (como las series del Line Chart y los grupos del Treemap).
+        const look = this.look();
+        if (look) return look.series[Math.max(0, this.groups.indexOf(g)) % look.series.length];
         return this.host.colorPalette.getColor(g).value;
     }
 
@@ -894,7 +972,7 @@ export class Visual implements IVisual {
         }
 
         // Bigotes
-        const wc = hc.on ? hc.fg : s.whiskerColor;
+        const wc = hc.on ? hc.fg : (s.whiskerColor || this.inkDim());
         const line = (a: [number, number], z: [number, number], color: string, w: number) =>
             this.el("line", { x1: a[0], y1: a[1], x2: z[0], y2: z[1], stroke: color, "stroke-width": w }, g);
         line(P(center, vPix(st.q3)), P(center, vPix(st.highWhisker)), wc, 1.2);
@@ -925,7 +1003,7 @@ export class Visual implements IVisual {
         // Mediana
         // Sobre una caja opaca, la mediana se elige por contraste: blanca en oscuro, negra en claro.
         const mc = hc.on ? hc.fg : (s.quartileColors ? "#FFFFFF"
-            : (opa >= 0.6 && (b.group !== null || s.template === "ibcs") ? (this.isDark(baseColor) ? "#FFFFFF" : "#000000") : s.medianColor));
+            : (opa >= 0.6 && (b.group !== null || (this.look() && !this.isSet("boxes", "medianColor"))) ? (this.isDark(baseColor) ? "#FFFFFF" : "#000000") : s.medianColor));
         const notchInset = s.notches ? bw * 0.22 : 0;
         line(P(u0 + notchInset, medp), P(u1 - notchInset, medp), mc, 2.5);
         if (s.medianLabel && bw > 14) {
@@ -938,14 +1016,14 @@ export class Visual implements IVisual {
         if (s.showMean) {
             const [x, y] = P(center, vPix(st.mean));
             const r = Math.max(3, Math.min(6, bw / 6));
-            this.el("path", { d: `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`, fill: hc.on ? hc.bg : s.meanColor, stroke: hc.on ? hc.fg : (s.template === "ibcs" ? "#262626" : "#FFFFFF"), "stroke-width": 1 }, g);
+            this.el("path", { d: `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`, fill: hc.on ? hc.bg : s.meanColor, stroke: hc.on ? hc.fg : (this.look()?.bg ?? "#FFFFFF"), "stroke-width": 1 }, g);
         }
         // Outliers: siempre dibujados, también encima de los puntos (siguen marcados con su color y tamaño)
         {
             const r = clamp(s.outlierSize, 1, 10);
             for (const v of st.outliers) {
                 const [x, y] = P(center, vPix(v));
-                this.el("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r, fill: hc.on ? "none" : s.outlierColor, "fill-opacity": 0.85, stroke: hc.on ? hc.fg : "#FFFFFF", "stroke-width": hc.on ? 1.5 : 0.8 }, g);
+                this.el("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r, fill: hc.on ? "none" : s.outlierColor, "fill-opacity": 0.85, stroke: hc.on ? hc.fg : (this.look()?.bg ?? "#FFFFFF"), "stroke-width": hc.on ? 1.5 : 0.8 }, g);
             }
         }
         // Zona de clic que cubre toda la caja con sus bigotes
@@ -970,7 +1048,7 @@ export class Visual implements IVisual {
         el.style.maxHeight = maxH + "px";
         el.style.fontSize = Math.max(this.minT, clamp(s.tableFont, 7, 24)) + "px";
         const hc = this.hc();
-        el.style.color = hc.on ? hc.fg : (s.tableColor || "#3D3929");
+        el.style.color = hc.on ? hc.fg : (s.tableColor || this.inkMain());
         const table = document.createElement("table");
         // Una tabla no siempre hereda color y tamaño (modo quirks del iframe): se fijan en ella.
         table.style.color = el.style.color;
@@ -985,8 +1063,8 @@ export class Visual implements IVisual {
         cols.forEach((c, i) => {
             const th = document.createElement("th"); th.textContent = c; if (i >= firstNum) th.className = "num";
             // Fondo propio: la cabecera queda fija al desplazar y sin fondo dejaría ver las filas por debajo.
-            th.style.background = hc.on ? hc.bg : (s.tableHeaderBg || "#FFFFFF");
-            th.style.color = hc.on ? hc.fg : (s.tableHeaderColor || s.tableColor || "#3D3929");
+            th.style.background = hc.on ? hc.bg : (s.tableHeaderBg || this.look()?.bg || "#FFFFFF");
+            th.style.color = hc.on ? hc.fg : (s.tableHeaderColor || s.tableColor || this.inkMain());
             head.appendChild(th);
         });
         const thead = document.createElement("thead"); thead.appendChild(head); table.appendChild(thead);
@@ -1023,7 +1101,7 @@ export class Visual implements IVisual {
         this.noteEl.style.display = msgs.length ? "block" : "none";
         this.noteEl.textContent = msgs.join(" · ");
         const hc = this.hc();
-        this.noteEl.style.color = hc.on ? hc.fg : "#83827D";
+        this.noteEl.style.color = hc.on ? hc.fg : (this.look()?.axis ?? "#83827D");
         this.noteEl.style.fontSize = Math.max(10, this.minT) + "px";
     }
 
@@ -1506,9 +1584,9 @@ export class Visual implements IVisual {
 
         return { cards: [
             card("style", "Style template", [
-                dd("style", "template", "Template", s.template, [["clean", "Enum_tpl_clean", "Clean"], ["classic", "Enum_tpl_classic", "Classic"],
-                    ["minimal", "Enum_tpl_minimal", "Minimal"], ["contrast", "Enum_tpl_contrast", "Contrast"], ["compact", "Enum_tpl_compact", "Compact"],
-                    ["ibcs", "Enum_tpl_ibcs", "IBCS style"]]),
+                // Los siete estilos de la colección, gratis en este visual (sin "(Pro)"). Los nombres propios no se traducen.
+                dd("style", "template", "Template", s.template, [["clean", "Enum_tpl_clean", "Report theme"],
+                    ...COLLECTION_STYLES.map(k => [k, "Enum_tpl_" + k, k.charAt(0).toUpperCase() + k.slice(1)] as [string, string, string])]),
             ]),
             card("boxes", "Boxes", [
                 dd("boxes", "orientation", "Orientation", s.orientation, [["vertical", "Enum_or_vertical", "Vertical"], ["horizontal", "Enum_or_horizontal", "Horizontal"]]),

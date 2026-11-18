@@ -20,6 +20,12 @@ ROLES = [
 def E(*items):
     return [{"value": v, "displayName": n, "displayNameKey": k} for v, k, n in items]
 
+# Los siete estilos de la colección (los mismos que Treemap y Line Chart). En este visual son GRATIS: sin "(Pro)".
+# Los nombres propios (Boardroom, Ledger…) no se traducen. Las plantillas de la 1.0.0 (classic, minimal, contrast,
+# compact, ibcs) ya no se ofrecen: visual.ts (LEGACY_TEMPLATES) las lee como el estilo nuevo más parecido.
+STYLES = ("boardroom", "ledger", "editorial", "signal", "aurora", "terrace")
+TEMPLATES = E(("clean", "Enum_tpl_clean", "Report theme"), *[(k, "Enum_tpl_" + k, k.capitalize()) for k in STYLES])
+
 # (objeto, nombre, [(prop, nombre, tipo)])  tipo: bool | num | text | color | colorfx | enum:[...] | fmt
 OBJECTS = [
     ("general", "General", [
@@ -27,9 +33,7 @@ OBJECTS = [
         ("formatString", "Format string", "fmt"),
     ]),
     ("style", "Style template", [
-        ("template", "Template", E(("clean", "Enum_tpl_clean", "Clean"), ("classic", "Enum_tpl_classic", "Classic"),
-                                    ("minimal", "Enum_tpl_minimal", "Minimal"), ("contrast", "Enum_tpl_contrast", "Contrast"),
-                                    ("compact", "Enum_tpl_compact", "Compact"), ("ibcs", "Enum_tpl_ibcs", "IBCS style"))),
+        ("template", "Template", TEMPLATES),
     ]),
     ("boxes", "Boxes", [
         ("orientation", "Orientation", E(("vertical", "Enum_or_vertical", "Vertical"), ("horizontal", "Enum_or_horizontal", "Horizontal"))),

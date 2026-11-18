@@ -93,7 +93,7 @@ def general():
       <li><b class="n">3</b><span><strong>Detail (rows)</strong> · the ID of each row: inspection, order, ticket</span></li></ol></div>
     <div class="card" style="flex:1"><h3>Free <span class="chip free">FREE</span></h3><ul class="l">
       <li>Boxes, whiskers, outliers and n for every category</li><li>Tukey or min–max whiskers; Excel QUARTILE.INC quartiles</li>
-      <li>6 templates incl. IBCS style; fx colours; vertical or horizontal</li><li>Cross-filtering, bookmarks, drilldown, keyboard, high contrast, 12 languages</li></ul></div>
+      <li>Report theme + 6 collection styles, all free; fx colours; vertical or horizontal</li><li>Cross-filtering, bookmarks, drilldown, keyboard, high contrast, 12 languages</li></ul></div>
   </div>
   <div class="shot"><img src="{data_uri('free.png', 1300)}" alt=""><div class="cap">Quality score by plant: Sevilla is high and consistent; Bilbao spreads from 46 to 72 in its middle half. Free version, median labels on.</div></div>
 </div>

@@ -35,7 +35,8 @@ you edit.
 
 ## Format pane
 
-- Style template — Clean, Classic, Minimal, Contrast, Compact and IBCS style; your own settings win.
+- Style template — Report theme or Boardroom, Ledger, Editorial, Signal, Aurora and Terrace, the same
+  styles as the other TCViz visuals, all free; your own settings and high contrast win.
 - Boxes — vertical or horizontal, colour (with fx conditional formatting), border, width, radius.
 - Whiskers, Statistics — whisker rule, n under each box, median labels.
 - Points — size and colour of the outliers (the full set of points is Pro).
@@ -73,7 +74,7 @@ you edit.
 ## Free and Pro
 
 Free is a complete, correct box plot: every box, whisker, outlier and n, Tukey or min–max whiskers,
-templates, fx colours, both orientations, filtering, bookmarks, drilldown, high contrast and 12 languages.
+the seven styles, fx colours, both orientations, filtering, bookmarks, drilldown, high contrast and 12 languages.
 Pro adds ways to compare it. While editing without a licence, Pro features are drawn working on your own
 data under a Pro preview watermark; reading view shows the free result.
 

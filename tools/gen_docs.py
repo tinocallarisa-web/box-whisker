@@ -72,7 +72,7 @@ FREE_PRO = [
     ("Outliers always drawn, also on top of the points", "✓", "✓"),
     ("n under each box, median label; n, min, quartiles, median, max, mean, outlier count and quartile method in the tooltip", "✓", "✓"),
     ("Quartiles: inclusive method (Excel QUARTILE.INC)", "✓", "✓"),
-    ("Vertical or horizontal; 6 style templates, including IBCS style", "✓", "✓"),
+    ("Vertical or horizontal; Report theme or the six collection styles (Boardroom, Ledger, Editorial, Signal, Aurora, Terrace)", "✓", "✓"),
     ("Box colour with conditional formatting (fx)", "✓", "✓"),
     ("Sort by data order or name", "✓", "✓"),
     ("Axes: title, gridlines, range, font, size, colour, bold", "✓", "✓"),
@@ -92,7 +92,7 @@ FREE_PRO = [
 ]
 
 FORMAT = [
-    ("Style template", "Clean, Classic, Minimal, Contrast, Compact, IBCS style. A template only fills what you have not set yourself."),
+    ("Style template", "Report theme (default: the colours and text of the report theme) or one of the six collection styles — Boardroom, Ledger, Editorial, Signal, Aurora, Terrace — the same as in the other TCViz visuals, so a page reads as one report. All seven are free. A style only fills what you have not set yourself; high contrast overrides it. Reports saved with a template of version 1.0.0 (Clean, Classic, Minimal, Contrast, Compact, IBCS style) open with the closest new style and keep their box widths, corners and gridlines."),
     ("Boxes", "Orientation; box colour with conditional formatting (fx) — the rule is evaluated per row, so base it on the category (a colour column or a measure that is constant within each category); colour by quartile and high contrast override it; border colour and width; box width %; rounded corners; fill opacity; median line colour; colour by quartile (Pro) with lower and upper half colours."),
     ("Whiskers", "Reach: 1.5 × IQR (Tukey), minimum to maximum, 5th–95th or 10th–90th percentile (Pro); caps; colour."),
     ("Statistics", "Quartile method (inclusive; exclusive and Tukey hinges are Pro); n under each box; median label; mean marker and colour (Pro); notches (Pro)."),

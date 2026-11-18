@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Simulador Playwright del Box & Whisker: formato dinámico (F11), tarjeta Accesibilidad (D10), fx y marca de agua.
+"""Simulador Playwright del Box & Whisker: formato dinámico (F11), tarjeta Accesibilidad (D10), fx, marca de agua y estilos de la colección.
 
 Carga el bundle de una build de prueba con un host simulado y un dataView categorical sintético (semilla fija).
 No reproduce el motor de Power BI: el formato dinámico real, los tooltips, el panel y la licencia solo se ven en Desktop.
@@ -164,7 +164,7 @@ async def main():
         await pg.close()
         pg = await page(b, "sim_pro", dataview("per-region", {"style": {"template": "compact"}}))
         sizes = await pg.evaluate("() => Array.from(document.querySelectorAll('svg text')).map(t => parseFloat(t.getAttribute('font-size')))")
-        check("mínimo por defecto (6): plantilla Compact igual que en la 1.0.0 (n a 7 px)", 7 in sizes and min(sizes) == 7, f"tamaños {sorted(set(sizes))}")
+        check("mínimo por defecto (6): plantilla antigua Compact (→ Report theme + su densidad) igual que en la 1.0.0 (n a 7 px)", 7 in sizes and min(sizes) == 7, f"tamaños {sorted(set(sizes))}")
         await pg.close()
 
         print("Panel de formato y fx")
@@ -199,6 +199,53 @@ async def main():
         pg = await page(b, "sim_free", dataview("per-region", {"points": {"show": True}}), view=0, license=True, name="12_lectura_sin_marca")
         wm = await pg.evaluate("() => { const w = document.querySelector('.tcviz-wm'); return w ? getComputedStyle(w).display : null; }")
         check("vista de lectura: sin marca", wm == "none", str(wm))
+        await pg.close()
+        print("Estilos de la colección (gratis) y compatibilidad con las plantillas de la 1.0.0")
+        TOK = {"clean": (None, "#2B6CB0"), "boardroom": ("#16263D", "#C9A45C"), "ledger": ("#FBF8EF", "#7A1F1F"),
+               "editorial": ("#FFFFFF", "#D7263D"), "signal": ("#FFFFFF", "#1F7A4D"), "aurora": ("#10395E", "#7CE7D0"), "terrace": ("#FBF5EC", "#B5532A")}
+        def hexrgb(h):
+            n = int(h[1:], 16); return f"rgb({(n >> 16) & 255}, {(n >> 8) & 255}, {n & 255})"
+        LOOK = """() => { const r = document.querySelector('g[data-box] rect:not(.tcbw-hit)'); const root = document.querySelector('.tcbw');
+            return { bg: root.style.background, font: root.style.fontFamily, fill: r.getAttribute('fill'), rx: r.getAttribute('rx'),
+                     grid: document.querySelectorAll('.tcbw-vaxis line').length, axis: (document.querySelector('.tcbw-vaxis text') || {getAttribute(){return null;}}).getAttribute('fill'),
+                     wm: (() => { const w = document.querySelector('.tcviz-wm'); return w ? getComputedStyle(w).display : 'none'; })() }; }"""
+        for i, (name, (bg, fill)) in enumerate(TOK.items()):
+            objs = {"style": {"template": name}, "statsTable": {"show": True}, "statistics": {"showMean": True}}
+            pg = await page(b, "sim_pro", dataview("per-region", objs), name=f"{14 + i:02d}_estilo_{name}")
+            st = await pg.evaluate(LOOK)
+            if bg is None:
+                ok = st["fill"] == fill and st["bg"] in ("", "transparent") and st["axis"] == "#605E5C"
+            else:
+                ok = st["fill"] == fill and (hexrgb(bg) in st["bg"] or "gradient" in st["bg"])
+            check(f"estilo {name}: fondo y caja con los tokens de la colección", ok, str(st))
+            await pg.close()
+        # Gratis: en la build sin licencia y en edición, un estilo no lleva marca de agua ni aviso.
+        pg = await page(b, "sim_free", dataview("per-region", {"style": {"template": "aurora"}}), view=1, license=True, name="21_estilo_aurora_gratis")
+        st = await pg.evaluate(LOOK)
+        check("estilo Aurora en la build gratuita, en edición: sin marca de agua", st["wm"] == "none" and "gradient" in st["bg"], str(st))
+        await pg.close()
+        # Compatibilidad: informes guardados con las plantillas antiguas.
+        pg = await page(b, "sim_pro", dataview("per-region", {"style": {"template": "classic"}}), name="22_antigua_classic_a_editorial")
+        st = await pg.evaluate(LOOK)
+        fm = await pg.evaluate("""() => { const sl = __v.getFormattingModel().cards.find(c => c.uid === 'style_card').groups[0].slices[0].control.properties;
+            return { v: sl.value.value, items: sl.items.map(i => i.value) }; }""")
+        check("plantilla antigua 'classic' → Editorial con esquinas rectas", st["fill"] == "#D7263D" and st["rx"] == "0" and "Georgia" in st["font"], str(st))
+        check("el desplegable muestra Editorial y ofrece solo los siete estilos nuevos",
+              fm["v"] == "editorial" and fm["items"] == ["clean", "boardroom", "ledger", "editorial", "signal", "aurora", "terrace"], str(fm))
+        await pg.close()
+        for old, exp_fill, exp_grid in (("ibcs", "#1F7A4D", 0), ("contrast", "#C9A45C", None), ("minimal", "#2B6CB0", 0)):
+            pg = await page(b, "sim_pro", dataview("per-region", {"style": {"template": old}}), name=f"23_antigua_{old}")
+            st = await pg.evaluate(LOOK)
+            check(f"plantilla antigua '{old}' se dibuja con su estilo nuevo", st["fill"] == exp_fill and (exp_grid is None or st["grid"] == exp_grid), str(st))
+            await pg.close()
+        # Lo que el usuario ha tocado gana a la plantilla; alto contraste gana al estilo.
+        pg = await page(b, "sim_pro", dataview("per-region", {"style": {"template": "boardroom"}, "boxes": {"fill": {"solid": {"color": "#7030A0"}}}}))
+        st = await pg.evaluate(LOOK)
+        check("Boardroom con color de caja puesto a mano: gana el del usuario", st["fill"] == "#7030A0" and hexrgb("#16263D") in st["bg"], str(st))
+        await pg.close()
+        pg = await page(b, "sim_pro", dataview("per-region", {"style": {"template": "boardroom"}, "accessibility": {"highContrast": "on"}}), name="24_boardroom_alto_contraste")
+        st = await pg.evaluate(LOOK)
+        check("Boardroom con alto contraste: manda el alto contraste", st["fill"] == "none" and "255" in st["bg"] and st["font"] == "", str(st))
         await pg.close()
         pg = await page(b, "sim_pro", None, 640, 400, name="13_landing")
         await pg.close()
