@@ -31,7 +31,7 @@ CHAPTERS
 0:00 All points, mean, notches and the violin
 0:00 Sort by median and reference lines
 0:00 Statistics table
-0:00 Style templates, IBCS style and format on the canvas
+0:00 Style templates and format on the canvas
 0:00 Click a box to filter the report
 0:00 Free and Pro
 
@@ -44,7 +44,7 @@ WHAT IT DOES
 ✅ n under every box, so a box built on 12 rows is not mistaken for one built on 12,000
 ✅ Whiskers at 1.5 × IQR (Tukey) or minimum to maximum
 ✅ Quartiles with the inclusive method, the same as Excel QUARTILE.INC, named in every tooltip
-✅ Vertical or horizontal; six style templates, including an IBCS style
+✅ Vertical or horizontal; Report theme and six TCViz collection styles
 ✅ Click a box to filter the report; bookmarks, drilldown, keyboard navigation and high contrast
 ✅ The measure's number format and the report language; twelve languages
 ✅ No network requests: every statistic is computed inside your report

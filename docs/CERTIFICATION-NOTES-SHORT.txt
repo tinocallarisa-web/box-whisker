@@ -1,6 +1,7 @@
 Box & Whisker by TCViz 1.0.1.0 - GUID boxWhiskerTCViz2CE5A430433541F1A1D3467185EBA171
 
-SOURCE CODE
+WHY 1.0.1.0: dynamic format strings per value, Format > Accessibility card, TCViz
+collection styles.  SOURCE CODE
 github.com/tinocallarisa-web/box-whisker, branch "certification". Public, no credentials.
 
 NEW IN 1.0.1.0
@@ -28,7 +29,7 @@ or Accessibility > High contrast > On.
 6. Format mode: click a box, an axis, the legend or the background - on-object panes.
 
 LINKS ON THE START SCREEN
-Guide and Product page open only on click or Enter, via host.launchUrl. Icon bundled.
+Guide, Product page and Video open only on click or Enter, via host.launchUrl.
 
 ROWS
 Categorical mapping, window of 30,000 rows. In the service fetchMoreData(true) loads further

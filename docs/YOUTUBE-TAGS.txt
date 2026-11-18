@@ -16,4 +16,4 @@ HR and service:
 response time analysis, resolution time, salary distribution, performance spread
 
 Power BI general:
-Power BI tutorial, Power BI tips, Power BI dashboard, IBCS, statistics table
+Power BI tutorial, Power BI tips, Power BI dashboard, statistics table
