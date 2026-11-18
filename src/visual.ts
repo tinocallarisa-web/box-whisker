@@ -12,6 +12,7 @@ import { BoxStats, QuartileMethod, WhiskerRule, boxStats, density, niceTicks, se
 import { STRINGS } from "./strings";
 import { LANDING_ICON } from "./landingIcon";
 import { createProWatermark, renderProWatermark } from "./comun/watermark";
+import { styleSeriesColor } from "./comun/paleta";
 
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
@@ -918,7 +919,7 @@ export class Visual implements IVisual {
     private groupColor(g: string): string {
         // Con un estilo de la colección, los grupos toman su serie (como las series del Line Chart y los grupos del Treemap).
         const look = this.look();
-        if (look) return look.series[Math.max(0, this.groups.indexOf(g)) % look.series.length];
+        if (look) return styleSeriesColor(look.series, Math.max(0, this.groups.indexOf(g)));
         return this.host.colorPalette.getColor(g).value;
     }
 
