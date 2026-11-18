@@ -1,18 +1,17 @@
 Box & Whisker by TCViz 1.0.1.0 - GUID boxWhiskerTCViz2CE5A430433541F1A1D3467185EBA171
 
-WHY 1.0.1.0: dynamic format strings per value, Format > Accessibility card, TCViz
-collection styles.  SOURCE CODE
+SOURCE CODE
 github.com/tinocallarisa-web/box-whisker, branch "certification". Public, no credentials.
 
 NEW IN 1.0.1.0
 general.formatString declared: each box uses the dynamic format of its rows. Format pane >
 Accessibility: high contrast On/Automatic, focus colour and width, minimum text size.
-Box colour fx: altConstantValueSelector null; Reset to default on every card.
+Box colour fx: altConstantValueSelector null; Reset to default on every card. Style
+templates are now the TCViz collection styles (saved 1.0.0 templates map to them).
 
 TESTING THE PREMIUM FEATURES - NO KEY NEEDED
 Pro comes from the AppSource plan via IVisualLicenseManager; no activation key.
-Import this .pbiviz and open a report in EDIT mode without a licence: each Pro capability is
-drawn WORKING under a "Pro preview" watermark that names it, and Power BI shows its licence
+In EDIT mode without a licence each Pro capability is drawn WORKING under a "Pro preview" watermark that names it, and Power BI shows its licence
 notice. Reading view shows the free result. Sign in to Desktop: without licence info
 Pro stays off, with no watermark.
 
@@ -37,10 +36,9 @@ segments (max 40); Desktop uses the first 30,000. The warning icon says how many
 
 PRIVACY
 privileges []. No network, no telemetry, no browser storage, no persistProperties.
-No innerHTML. Texts in 12 languages (own texts bundled: Desktop only resolves capability keys).
+No innerHTML in our code. 12 languages, own texts bundled.
 
-Rendering events: one started/finished pair per update(); the licence repaint does not call
-update(). eslint (powerbi-visuals plugin) 0 errors.
+One render started/finished pair per update(); repaints never call update(). eslint 0.
 
 Video https://www.youtube.com/watch?v=OuzwKX96w4M
 Support/privacy/terms: tinocallarisa-web.github.io/box-whisker/
