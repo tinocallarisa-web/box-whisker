@@ -1,4 +1,4 @@
-# AppSource Listing — Box & Whisker by TCViz 1.0.0.0
+# AppSource Listing — Box & Whisker by TCViz 1.0.1.0
 
 Copy ready to paste into Partner Center, English only. **Editing this file does not change the offer**: every field
 is pasted by hand in Partner Center.
@@ -82,6 +82,9 @@ GETTING STARTED
 1. Category: the field that defines the boxes — region, product, team.
 2. Value: the measure to study — days, amount, score.
 3. Detail (rows): the ID of each row — order, employee, ticket.
+
+WHAT'S NEW IN 1.0.1
+Dynamic format strings per row: each box shows its own format, such as a currency per region. A new Accessibility card: high contrast on demand, focus colour and width, and a minimum text size.
 
 Documentation, how to read a box plot and FAQ: https://tinocallarisa-web.github.io/box-whisker/support.html
 Questions: https://github.com/tinocallarisa-web/box-whisker/discussions

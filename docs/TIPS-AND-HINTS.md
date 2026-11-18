@@ -1,4 +1,4 @@
-# Box & Whisker by TCViz — Tips & Hints (1.0.0.0)
+# Box & Whisker by TCViz — Tips & Hints (1.0.1.0)
 
 A box plot for Power BI: how the values of each category are spread — the median, the middle half, the
 normal range and the cases outside it. This page is the short version of everything worth knowing.
@@ -19,7 +19,7 @@ you edit.
 | Well | Limit | What it does |
 |---|---|---|
 | Category | several fields | One box per value; with a hierarchy, drill down from the header. |
-| Value | 1 | The measure whose spread is shown; its number format is used. |
+| Value | 1 | The measure whose spread is shown; its number format is used, dynamic format strings row by row. |
 | Detail (rows) | 1 | The ID of each row: each row becomes one value in its box. |
 | Group (Pro) | 1 | Boxes side by side inside each category, with a legend. |
 | Small multiples (Pro) | 1 | One panel per value, all on the same scale. |
@@ -41,6 +41,8 @@ you edit.
 - Points — size and colour of the outliers (the full set of points is Pro).
 - Value axis — automatic or fixed range, gridlines, title, font and bold; integer data gets integer ticks.
 - Category axis, Legend, Background.
+- Accessibility — high contrast on demand (also without the Windows theme), focus colour and width,
+  minimum text size for the chart and the table.
 
 ## Pro
 

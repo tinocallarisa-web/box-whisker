@@ -4,7 +4,7 @@
     "displayName": "Box & Whisker by TCViz",
     "guid": "boxWhiskerTCViz2CE5A430433541F1A1D3467185EBA171",
     "visualClassName": "Visual",
-    "version": "1.0.0.0",
+    "version": "1.0.1.0",
     "description": "A box plot that reads well: quartiles, whiskers and outliers per category, n on every box, documented quartile method. Pro adds points with jitter, mean and notches, violin, groups and small multiples, reference lines and sorting by median.",
     "supportUrl": "https://tinocallarisa-web.github.io/box-whisker/support.html",
     "privacyTermsLink": "https://tinocallarisa-web.github.io/box-whisker/privacy.html",

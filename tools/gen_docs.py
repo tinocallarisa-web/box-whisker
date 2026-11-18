@@ -12,7 +12,7 @@ NAME = "Box & Whisker by TCViz"
 BASE = "https://tinocallarisa-web.github.io/box-whisker/"
 REPO = "https://github.com/tinocallarisa-web/box-whisker"
 VERSION = json.load(io.open(os.path.join(ROOT, "pbiviz.json"), encoding="utf-8"))["visual"]["version"]
-FECHA = "19 October 2026"
+FECHA = "18 November 2026"
 VIDEO = "https://www.youtube.com/watch?v=OuzwKX96w4M"
 
 plantilla = io.open(os.path.join(WC, "privacy.html"), encoding="utf-8").read()
@@ -105,6 +105,7 @@ FORMAT = [
     ("Legend", "Shown with a Group field; position top or bottom; text size and colour."),
     ("Statistics table", "Show (Pro), below the chart, up to 35 % of the height with its own scroll; text size and colour; header background and text colour; alternate row colour."),
     ("Small multiples", "Columns (0 = automatic); space between panels; title size, colour, bold and alignment; panel background and border."),
+    ("Accessibility", "High contrast: Automatic (follows the Windows contrast theme) or On (black on white, also without the Windows theme); focus colour and width of the keyboard focus around a box; minimum text size for every text of the chart and the statistics table (default 6, the smallest the visual draws)."),
     ("Background", "Colour of the whole visual."),
 ]
 
@@ -142,7 +143,9 @@ FAQ = [
      "<p>On the visual's Microsoft AppSource page, choose <strong>Buy now</strong> (not Install free). Licences are per user and managed by "
      "Microsoft; restart Power BI Desktop after the licence is assigned. See <a href=\"https://tcviz.com/licensing.html\">tcviz.com/licensing</a>.</p>"),
     ("How are numbers formatted?",
-     "<p>With the measure's number format from the model, dynamic format strings included, in the report's language. Statistics that are not "
+     "<p>With the measure's number format from the model, in the report's language. Dynamic format strings are read row by row: each box "
+     "uses the format of its rows (for example a currency per region) in its tooltip, median label and statistics table row. The value axis "
+     "uses that format when every box shares it, and the measure's own format when they differ. Statistics that are not "
      "whole numbers (mean, interpolated quartiles, standard deviation) show up to two decimals when the format has none.</p>"),
     ("Is my data sent anywhere?",
      "<p>No. The visual makes no network requests and stores nothing outside your report. The links on the start screen open only when you click "
@@ -251,7 +254,9 @@ Reading view shows the free result. Pro is sold per user on Microsoft AppSource.
 <ul>
 <li>Keyboard: Tab into the visual, arrows move between boxes, Home/End jump to the first/last box, Enter or Space selects, Esc clears, the context-menu key opens the menu. The tooltip opens on the focused box.</li>
 <li>Each box has a description for screen readers with its median, quartiles and n.</li>
-<li>High contrast: the visual uses the colours of the Windows contrast theme.</li>
+<li>High contrast: the visual uses the colours of the Windows contrast theme. Format pane → Accessibility → High contrast → On applies it without the Windows theme (black on white).</li>
+<li>Keyboard focus: a dashed outline around the focused box; its colour and width are in Format pane → Accessibility.</li>
+<li>Minimum text size (Format pane → Accessibility): raises every text of the chart and the statistics table to at least that size.</li>
 <li>The layout adapts to the size of the visual: axes, n labels and legend give way before the boxes do; the legend shows the groups that fit, and the start screen has three layouts.</li>
 </ul>
 </div>

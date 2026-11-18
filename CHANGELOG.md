@@ -2,6 +2,13 @@
 
 All notable changes to Box & Whisker by TCViz. Power BI four-part version numbers.
 
+## 1.0.1.0 — 2026-11-18
+
+- Dynamic format strings per row: each box shows its own format (for example a currency per region) in the tooltip, median label, statistics table and screen-reader description; the value axis uses it when all boxes share it.
+- New Accessibility card in the Format pane: high contrast (Automatic or On), colour and width of the keyboard focus, and a minimum text size for the chart and the statistics table.
+- Fix: a fixed box colour chosen next to the fx button is now kept as one colour for the whole visual and shown in the Format pane; every card has Reset to default.
+- The Pro preview watermark is now the same as in the other TCViz visuals.
+
 ## 1.0.0.0 — 2026-10-19
 
 - First release: boxes, whiskers and outliers per category, with n under each box and the quartile method in every tooltip.

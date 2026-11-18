@@ -1,3 +1,4 @@
+@import (less) "comun/watermark.less";
 .tcbw {
     position: absolute;
     inset: 0;
@@ -9,7 +10,8 @@
     text { user-select: none; }
 }
 .tcbw-box { cursor: pointer; outline: none; }
-.tcbw-box:focus-visible .tcbw-hit { stroke: #1F4E80; stroke-width: 2px; stroke-dasharray: 3 2; }
+// Color y grosor del foco: tarjeta Accesibilidad (variables puestas por paintSelection).
+.tcbw-box:focus-visible .tcbw-hit { stroke: var(--tcbw-focus, #1F4E80); stroke-width: var(--tcbw-focus-w, 2px); stroke-dasharray: 3 2; }
 .tcbw-table {
     display: none;
     flex: 0 0 auto;
@@ -32,23 +34,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.tcbw-watermark {
-    display: none;
-    position: absolute;
-    inset: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    // Visible sobre fondos grises (estilo IBCS) sin tapar las cajas: color más opaco y halo claro.
-    color: rgba(43, 108, 176, 0.42);
-    font-weight: 800;
-    text-align: center;
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 0.9);
-    .tcbw-wm-title { text-transform: uppercase; letter-spacing: .08em; }
-    .tcbw-wm-why { font-size: .4em; font-weight: 700; margin-top: .3em; color: rgba(31, 78, 128, 0.85); max-width: 80%; }
-}
-
 // Pantalla de inicio: tres tamaños según el recuadro
 .tcbw-landing {
     display: none;

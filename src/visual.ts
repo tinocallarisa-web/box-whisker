@@ -11,6 +11,7 @@ import {
 import { BoxStats, QuartileMethod, WhiskerRule, boxStats, density, niceTicks, seeded } from "./stats";
 import { STRINGS } from "./strings";
 import { LANDING_ICON } from "./landingIcon";
+import { createProWatermark, renderProWatermark } from "./comun/watermark";
 
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
@@ -69,6 +70,7 @@ interface Settings {
     table: boolean; tableFont: number; tableColor: string; tableHeaderBg: string; tableHeaderColor: string; tableBanding: string;
     smCols: number; smGap: number; smTitleSize: number; smTitleColor: string; smTitleBold: boolean; smTitleAlign: string;
     smBackground: string; smBorder: boolean; smBorderColor: string;
+    hcMode: string; focusColor: string; focusWidth: number; minText: number;
     background: string;
 }
 
@@ -89,6 +91,9 @@ const DEFAULTS: Settings = {
     table: false, tableFont: 11, tableColor: "#3D3929", tableHeaderBg: "#F3F2F1", tableHeaderColor: "", tableBanding: "",
     smCols: 0, smGap: 8, smTitleSize: 12, smTitleColor: "#3D3929", smTitleBold: true, smTitleAlign: "left",
     smBackground: "", smBorder: false, smBorderColor: "#E1DFDD",
+    // Accesibilidad: por defecto, lo mismo que la 1.0.0 (alto contraste de Windows, foco azul de 2 px, sin mínimo
+    // por encima del 6 que ya imponía el dibujo). Subir el mínimo agranda todos los textos del gráfico.
+    hcMode: "auto", focusColor: "#1F4E80", focusWidth: 2, minText: 6,
     background: "",
 };
 
@@ -158,6 +163,8 @@ function readSettings(objects: Objects): Settings {
         smTitleBold: pick("smallMultiples", "titleBold", "smTitleBold"), smTitleAlign: pick("smallMultiples", "titleAlign", "smTitleAlign"),
         smBackground: pick("smallMultiples", "background", "smBackground"), smBorder: pick("smallMultiples", "border", "smBorder"),
         smBorderColor: pick("smallMultiples", "borderColor", "smBorderColor"),
+        hcMode: pick("accessibility", "highContrast", "hcMode"), focusColor: pick("accessibility", "focusColor", "focusColor"),
+        focusWidth: pick("accessibility", "focusWidth", "focusWidth"), minText: pick("accessibility", "minTextSize", "minText"),
         background: pick("background", "color", "background"),
     };
 }
@@ -174,6 +181,7 @@ interface Box {
     id: ISelectionId | null;        // la primera fila: menú contextual
     ids: ISelectionId[];            // todas las filas de la caja: filtro, tooltip y marcadores
     ruleColor: string | null;       // color resuelto por la regla fx (formato condicional)
+    fmt: string | undefined;        // cadena de formato dinámica de la medida (primera fila de la caja que la trae)
     tips: { name: string; value: string }[];
     seed: number;
 }
@@ -203,6 +211,8 @@ export class Visual implements IVisual {
     private allInt = true;
     private fmt: (v: number) => string = v => String(v);
     private fmtAxis: (v: number) => string = v => String(v);
+    /** Formateadores por cultura + cadena: el formato dinámico puede cambiar caja a caja. */
+    private fmtCache = new Map<string, (v: number) => string>();
     private lastOptions: VisualUpdateOptions | null = null;
     private lastDv: DataView | undefined;
     private hasData = false;
@@ -255,10 +265,7 @@ export class Visual implements IVisual {
         this.noteEl = document.createElement("div");
         this.noteEl.className = "tcbw-note";
         this.root.appendChild(this.noteEl);
-        this.watermarkEl = document.createElement("div");
-        this.watermarkEl.className = "tcbw-watermark";
-        this.watermarkEl.setAttribute("aria-hidden", "true");
-        this.root.appendChild(this.watermarkEl);
+        this.watermarkEl = createProWatermark(this.root);
 
         this.subSelectionHelper = HtmlSubSelectionHelper.createHtmlSubselectionHelper({
             hostElement: options.element,
@@ -442,14 +449,7 @@ export class Visual implements IVisual {
         // Formato nativo de la medida, releído en cada update: así se aplican también las cadenas de formato dinámicas.
         this.valueFormat = this.formatOf(valCol);
         this.allInt = true;
-        // Estadísticos (media, cuartiles interpolados, desviación): con un formato entero, "7,6" saldría "8".
-        const base = this.formatter(this.valueFormat, undefined, culture);
-        const plain = (() => { try { return new Intl.NumberFormat(culture, { maximumFractionDigits: 2 }); } catch { return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }); } })();
-        this.fmt = (v: number) => {
-            const out = base(v);
-            if (Number.isInteger(v) || /%/.test(this.valueFormat || "") || /[.,]\d/.test(out)) return out;
-            return plain.format(v);
-        };
+        this.fmt = (v: number) => this.fmtWith(v, this.valueFormat);
         const s = this.effective();
         const method = s.method as QuartileMethod, rule = s.whiskerRule as WhiskerRule;
 
@@ -501,13 +501,17 @@ export class Visual implements IVisual {
             const tips = tipCols.map((tc, k) => {
                 const arr = b.tips[k];
                 const avg = arr.length ? arr.reduce((a, x) => a + x, 0) / arr.length : NaN;
-                return { name: tc.source.displayName, value: Number.isFinite(avg) ? this.formatter(this.formatOf(tc), undefined, culture)(avg) : "" };
+                return { name: tc.source.displayName, value: Number.isFinite(avg) ? this.fmtWith(avg, this.rowFormat(tc, b.rows) || this.formatOf(tc)) : "" };
             });
             this.boxes.push({
                 key, cat: b.cat, group: b.group, panel: b.panel, values: b.vals,
-                stats: boxStats(b.vals, method, rule), id: ids[0] ?? null, ids, ruleColor: fx, tips, seed: seed++,
+                stats: boxStats(b.vals, method, rule), id: ids[0] ?? null, ids, ruleColor: fx, fmt: this.rowFormat(valCol, b.rows), tips, seed: seed++,
             });
         });
+        // Eje y líneas de referencia: si todas las cajas traen el mismo formato dinámico, se usa ese; si difieren
+        // (moneda por región, por ejemplo), el eje se queda con el formato de la columna y cada caja con el suyo.
+        const dyn = new Set(this.boxes.map(x => x.fmt));
+        if (dyn.size === 1 && this.boxes[0]?.fmt) this.valueFormat = this.boxes[0].fmt;
         this.sortCategories(s);
         return true;
     }
@@ -535,6 +539,46 @@ export class Visual implements IVisual {
         try { return valueFormatter.getFormatStringByColumn(col.source as any) || col.source.format; } catch { return col.source.format; }
     }
 
+    /**
+     * F11, formato dinámico: con general.formatString declarado en capabilities, Power BI manda la cadena de cada
+     * fila en objects[r].general.formatString. Una caja agrupa filas: vale la primera que la trae.
+     */
+    private rowFormat(col: powerbi.DataViewValueColumn, rows: number[]): string | undefined {
+        if (!col.objects) return undefined;
+        for (const r of rows) {
+            const f = (col.objects[r] as any)?.general?.formatString;
+            if (typeof f === "string" && f) return f;
+        }
+        return undefined;
+    }
+
+    /**
+     * Valor formateado con la cadena dada (o la de la columna), con caché por cultura y cadena. Estadísticos
+     * (media, cuartiles interpolados, desviación): con un formato entero, "7,6" saldría "8"; entonces, 2 decimales.
+     */
+    private fmtWith(v: number, format: string | undefined): string {
+        const culture = (this.host as any).locale;
+        const key = (culture || "") + "\u0001" + (format || "");
+        let f = this.fmtCache.get(key);
+        if (!f) {
+            const base = this.formatter(format, undefined, culture);
+            const plain = (() => { try { return new Intl.NumberFormat(culture, { maximumFractionDigits: 2 }); } catch { return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }); } })();
+            f = (x: number) => {
+                const out = base(x);
+                if (Number.isInteger(x) || /%/.test(format || "") || /[.,]\d/.test(out)) return out;
+                return plain.format(x);
+            };
+            if (this.fmtCache.size > 200) this.fmtCache.clear();
+            this.fmtCache.set(key, f);
+        }
+        return f(v);
+    }
+
+    /** Valor de una caja con su propio formato dinámico. */
+    private bfmt(b: Box, v: number): string {
+        return this.fmtWith(v, b.fmt || this.valueFormat);
+    }
+
     private formatter(format: string | undefined, value?: number, culture?: string): (v: number) => string {
         try {
             const f = valueFormatter.create({ format: format || undefined, value, cultureSelector: culture } as any);
@@ -555,9 +599,21 @@ export class Visual implements IVisual {
         return e;
     }
 
+    /**
+     * Alto contraste: el de Windows (siempre) o forzado desde la tarjeta Accesibilidad ("On"). Forzado sin el tema
+     * de Windows, negro sobre blanco.
+     */
     private hc(): { on: boolean; fg: string; bg: string; sel: string } {
         const p: any = this.host.colorPalette;
-        return { on: !!p?.isHighContrast, fg: p?.foreground?.value || "#000000", bg: p?.background?.value || "#FFFFFF", sel: p?.foregroundSelected?.value || p?.foreground?.value || "#000000" };
+        const sys = !!p?.isHighContrast;
+        const on = sys || this.s.hcMode === "on";
+        return { on, fg: sys ? (p?.foreground?.value || "#000000") : "#000000", bg: sys ? (p?.background?.value || "#FFFFFF") : "#FFFFFF",
+            sel: sys ? (p?.foregroundSelected?.value || p?.foreground?.value || "#000000") : "#000000" };
+    }
+
+    /** Tamaño mínimo de texto de la tarjeta Accesibilidad. */
+    private get minT(): number {
+        return clamp(this.s.minText, 6, 24);
     }
 
     /** Dibuja con el último dataView. Lo usa update() y el repintado tras resolver la licencia. */
@@ -568,7 +624,7 @@ export class Visual implements IVisual {
         this.subSelectable(this.root, "background", this.t("Obj_background", "Background"), powerbi.visuals.SubSelectionStylesType.Shape);
         if (!this.hasData) {
             this.clearSvg(); this.tableEl.style.display = "none"; this.noteEl.style.display = "none";
-            this.watermarkEl.style.display = "none";
+            renderProWatermark(this.watermarkEl, null);
             this.landing(vp.width, vp.height);
             this.warnings();
             return;
@@ -594,7 +650,8 @@ export class Visual implements IVisual {
         const hc = this.hc();
         const small = W < 260 || H < 180;
         const vertical = s.orientation !== "horizontal";
-        const fontV = clamp(s.vFont, 6, 40), fontC = clamp(s.cFont, 6, 40);
+        const minT = this.minT;
+        const fontV = Math.max(minT, clamp(s.vFont, 6, 40)), fontC = Math.max(minT, clamp(s.cFont, 6, 40));
         const showV = s.vAxis && !(W < 140 || H < 100);
         const showC = s.cAxis && !(W < 140 || H < 100);
         const showN = s.showN && !small;
@@ -604,7 +661,7 @@ export class Visual implements IVisual {
         if (this.groups.length && s.legend && H > 140) {
             const lg = this.el("g", { class: "tcbw-legend" }, this.svg);
             this.subSelectable(lg, "legend", this.t("Obj_legend", "Legend"), powerbi.visuals.SubSelectionStylesType.Text);
-            const fl = clamp(s.legendFont, 6, 30);
+            const fl = Math.max(minT, clamp(s.legendFont, 6, 30));
             const rowH = fl + 9;
             const y = s.legendPos === "bottom" ? H - rowH / 2 - 2 : rowH / 2 + 2;
             let x = 8;
@@ -657,7 +714,7 @@ export class Visual implements IVisual {
         const autoCols = Math.max(1, Math.round(Math.sqrt(panels.length * (W / Math.max(1, H)))));
         const cols = panels.length === 1 ? 1 : Math.min(panels.length, s.smCols > 0 ? Math.round(s.smCols) : autoCols);
         const rows = Math.ceil(panels.length / cols);
-        const smTitle = clamp(s.smTitleSize, 6, 40);
+        const smTitle = Math.max(minT, clamp(s.smTitleSize, 6, 40));
         const panelTitleH = panels[0] !== null ? smTitle + 8 : 0;
         const gap = panels[0] !== null ? clamp(s.smGap, 0, 60) : 0;
         const plotW = W, plotH = H - top - bottom;
@@ -729,8 +786,8 @@ export class Visual implements IVisual {
                 this.el("line", { x1, y1, x2, y2, stroke: hc.on ? hc.fg : s.refColor, "stroke-width": 1.5, "stroke-dasharray": "5 4" }, g);
                 const label = (rl ? rl + " " : "") + this.fmt(rv);
                 const t = vertical
-                    ? this.el("text", { x: left + pw - 2, y: p - 4, "text-anchor": "end", "font-size": Math.max(8, fontV - 1), fill: hc.on ? hc.fg : s.refColor }, g)
-                    : this.el("text", { x: p + 4, y: pTop + 10, "font-size": Math.max(8, fontV - 1), fill: hc.on ? hc.fg : s.refColor }, g);
+                    ? this.el("text", { x: left + pw - 2, y: p - 4, "text-anchor": "end", "font-size": Math.max(minT, 8, fontV - 1), fill: hc.on ? hc.fg : s.refColor }, g)
+                    : this.el("text", { x: p + 4, y: pTop + 10, "font-size": Math.max(minT, 8, fontV - 1), fill: hc.on ? hc.fg : s.refColor }, g);
                 t.textContent = label;
             }
 
@@ -747,7 +804,7 @@ export class Visual implements IVisual {
                     const t = this.el("text", { x: mid, y: pTop + ph + fontC + 4, "text-anchor": "middle", "font-size": fontC, fill: hc.on ? hc.fg : s.cColor }, caxis);
                     t.textContent = cat.length > maxChars ? cat.slice(0, maxChars - 1) + "…" : cat;
                     if (showN && nTotal) {
-                        const tn = this.el("text", { x: mid, y: pTop + ph + 2 * fontC + 6, "text-anchor": "middle", "font-size": Math.max(7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
+                        const tn = this.el("text", { x: mid, y: pTop + ph + 2 * fontC + 6, "text-anchor": "middle", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
                         tn.textContent = "n = " + nTotal.toLocaleString((this.host as any).locale);
                     }
                 } else {
@@ -755,7 +812,7 @@ export class Visual implements IVisual {
                     const t = this.el("text", { x: left - 6, y: mid + (showN ? -1 : fontC * 0.35), "text-anchor": "end", "font-size": fontC, fill: hc.on ? hc.fg : s.cColor }, caxis);
                     t.textContent = cat.length > maxChars ? cat.slice(0, maxChars - 1) + "…" : cat;
                     if (showN && nTotal && band > fontC * 2.2) {
-                        const tn = this.el("text", { x: left - 6, y: mid + fontC, "text-anchor": "end", "font-size": Math.max(7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
+                        const tn = this.el("text", { x: left - 6, y: mid + fontC, "text-anchor": "end", "font-size": Math.max(minT, 7, fontC - 2), fill: hc.on ? hc.fg : "#83827D" }, caxis);
                         tn.textContent = "n = " + nTotal.toLocaleString((this.host as any).locale);
                     }
                 }
@@ -803,7 +860,7 @@ export class Visual implements IVisual {
         const u0 = center - bw / 2, u1 = center + bw / 2;
         const g = this.el("g", { "data-box": b.key, class: "tcbw-box", tabindex: -1, role: "option" }, parent);
         g.setAttribute("aria-label", `${b.cat}${b.group !== null ? " · " + b.group : ""}${b.panel !== null ? " · " + b.panel : ""}: ` +
-            `${this.t("UI_Median", "Median")} ${this.fmt(st.median)}, Q1 ${this.fmt(st.q1)}, Q3 ${this.fmt(st.q3)}, n ${st.n}`);
+            `${this.t("UI_Median", "Median")} ${this.bfmt(b, st.median)}, Q1 ${this.bfmt(b, st.q1)}, Q3 ${this.bfmt(b, st.q3)}, n ${st.n}`);
         const baseColor = hc.on ? hc.fg : (b.ruleColor || (b.group !== null ? this.groupColor(b.group) : s.fill));
         const stroke = hc.on ? hc.fg : (b.group !== null && !b.ruleColor ? baseColor : s.border);
         const opa = clamp(s.opacity, 0, 100) / 100;
@@ -874,8 +931,8 @@ export class Visual implements IVisual {
         if (s.medianLabel && bw > 14) {
             // Vertical: a la derecha de la caja. Horizontal: encima de la caja, sobre la mediana.
             const [x, y] = vertical ? P(u1 + 3, medp) : P(u0 - 4, medp);
-            const t = this.el("text", { x, y: vertical ? y + 3.5 : y, "font-size": Math.max(8, s.cFont - 1), fill: hc.on ? hc.fg : s.medianColor, "text-anchor": vertical ? "start" : "middle" }, g);
-            t.textContent = this.fmt(st.median);
+            const t = this.el("text", { x, y: vertical ? y + 3.5 : y, "font-size": Math.max(this.minT, 8, s.cFont - 1), fill: hc.on ? hc.fg : s.medianColor, "text-anchor": vertical ? "start" : "middle" }, g);
+            t.textContent = this.bfmt(b, st.median);
         }
         // Media (Pro): rombo
         if (s.showMean) {
@@ -911,7 +968,7 @@ export class Visual implements IVisual {
         el.style.display = "block";
         const maxH = Math.max(60, Math.floor(H * 0.35));
         el.style.maxHeight = maxH + "px";
-        el.style.fontSize = clamp(s.tableFont, 7, 24) + "px";
+        el.style.fontSize = Math.max(this.minT, clamp(s.tableFont, 7, 24)) + "px";
         const hc = this.hc();
         el.style.color = hc.on ? hc.fg : (s.tableColor || "#3D3929");
         const table = document.createElement("table");
@@ -943,8 +1000,8 @@ export class Visual implements IVisual {
                 const st = b.stats, tr = document.createElement("tr");
                 if (s.tableBanding && !hc.on && tbody.childElementCount % 2 === 1) tr.style.background = s.tableBanding;
                 const cells = [b.cat].concat(this.groups.length ? [b.group ?? ""] : []).concat(this.panels.length ? [b.panel ?? ""] : [])
-                    .concat([st.n.toLocaleString((this.host as any).locale), this.fmt(st.min), this.fmt(st.q1), this.fmt(st.median), this.fmt(st.q3),
-                        this.fmt(st.max), this.fmt(st.mean), this.fmt(st.sd), String(st.outliers.length)]);
+                    .concat([st.n.toLocaleString((this.host as any).locale), this.bfmt(b, st.min), this.bfmt(b, st.q1), this.bfmt(b, st.median), this.bfmt(b, st.q3),
+                        this.bfmt(b, st.max), this.bfmt(b, st.mean), this.bfmt(b, st.sd), String(st.outliers.length)]);
                 cells.forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i >= firstNum) td.className = "num"; tr.appendChild(td); });
                 tbody.appendChild(tr);
             }
@@ -967,18 +1024,17 @@ export class Visual implements IVisual {
         this.noteEl.textContent = msgs.join(" · ");
         const hc = this.hc();
         this.noteEl.style.color = hc.on ? hc.fg : "#83827D";
+        this.noteEl.style.fontSize = Math.max(10, this.minT) + "px";
     }
 
+    /** Marca de agua común de la cartera (src/comun/watermark.ts): solo en vista previa Pro. */
     private renderWatermark(W: number, H: number): void {
         const wanted = this.isPreview() ? this.attemptedPro() : [];
-        const el = this.watermarkEl;
-        if (!wanted.length) { el.style.display = "none"; return; }
-        while (el.firstChild) el.removeChild(el.firstChild);
-        el.style.display = "flex";
-        const t = document.createElement("div"); t.className = "tcbw-wm-title"; t.textContent = this.t("UI_ProPreview", "Pro preview");
-        const w = document.createElement("div"); w.className = "tcbw-wm-why"; w.textContent = wanted.map(x => x.label).join(" · ");
-        el.appendChild(t); el.appendChild(w);
-        el.style.fontSize = Math.max(14, Math.min(44, Math.min(W, H) / 7)) + "px";
+        const hc = this.hc();
+        renderProWatermark(this.watermarkEl, wanted.length ? {
+            width: W, height: H, title: this.t("UI_ProPreview", "Pro preview"), features: wanted.map(x => x.label),
+            highContrast: hc.on ? { foreground: hc.fg, background: hc.bg } : null,
+        } : null);
     }
 
     /** Icono de aviso de la cabecera: filas que Power BI no ha entregado. */
@@ -1098,12 +1154,12 @@ export class Visual implements IVisual {
         const loc = (this.host as any).locale;
         items.push(
             { displayName: "n", value: st.n.toLocaleString(loc) },
-            { displayName: this.t("UI_Max", "Max"), value: this.fmt(st.max) },
-            { displayName: "Q3", value: this.fmt(st.q3) },
-            { displayName: this.t("UI_Median", "Median"), value: this.fmt(st.median) },
-            { displayName: "Q1", value: this.fmt(st.q1) },
-            { displayName: this.t("UI_Min", "Min"), value: this.fmt(st.min) },
-            { displayName: this.t("UI_Mean", "Mean"), value: this.fmt(st.mean) },
+            { displayName: this.t("UI_Max", "Max"), value: this.bfmt(b, st.max) },
+            { displayName: "Q3", value: this.bfmt(b, st.q3) },
+            { displayName: this.t("UI_Median", "Median"), value: this.bfmt(b, st.median) },
+            { displayName: "Q1", value: this.bfmt(b, st.q1) },
+            { displayName: this.t("UI_Min", "Min"), value: this.bfmt(b, st.min) },
+            { displayName: this.t("UI_Mean", "Mean"), value: this.bfmt(b, st.mean) },
             { displayName: this.t("UI_Outliers", "Outliers"), value: String(st.outliers.length) },
             { displayName: this.t("UI_Method", "Quartiles"), value: this.methodName() },
         );
@@ -1121,6 +1177,10 @@ export class Visual implements IVisual {
     private paintSelection(): void {
         const elegidas = this.selectedBoxes();
         const has = elegidas.size > 0;
+        // Foco de teclado (tarjeta Accesibilidad): en alto contraste, el color de selección del tema.
+        const hc = this.hc();
+        this.root.style.setProperty("--tcbw-focus", hc.on ? hc.sel : (this.s.focusColor || "#1F4E80"));
+        this.root.style.setProperty("--tcbw-focus-w", clamp(this.s.focusWidth, 1, 6) + "px");
         this.svg.querySelectorAll<SVGGElement>("g[data-box]").forEach(g => {
             const on = !has || elegidas.has(g.getAttribute("data-box") || "");
             g.setAttribute("opacity", on ? "1" : "0.3");
@@ -1427,6 +1487,9 @@ export class Visual implements IVisual {
                 descriptor: { ...d(obj, prop), ...(cf ? {
                     instanceKind: powerbi.VisualEnumerationInstanceKinds.ConstantOrRule,
                     selector: dataViewWildcard.createDataViewWildcardSelector(dataViewWildcard.DataViewWildcardMatchingOption.InstancesAndTotals) as any,
+                    // Sin esto el color FIJO se guardaría con el selector comodín: llegaría fila a fila, el panel no lo
+                    // recordaría y el visual lo tomaría por regla. null = el fijo va a metadata.objects.
+                    altConstantValueSelector: null,
                 } : {}) },
                 value: { value: v || "" },
             } },
@@ -1436,7 +1499,10 @@ export class Visual implements IVisual {
             return { uid: `${obj}_${prop}`, displayName: name(obj, prop, fb),
                 control: { type: powerbi.visuals.FormattingComponent.Dropdown, properties: { descriptor: d(obj, prop), value: list.find(x => x.value === v) ?? list[0], items: list } as any } };
         };
-        const card = (obj: string, fb: string, slices: any[]) => ({ uid: `${obj}_card`, displayName: T(`Obj_${obj}`, fb), groups: [{ uid: `${obj}_g`, displayName: "", slices }] });
+        // revertToDefaultDescriptors: "Restablecer valores predeterminados" en cada tarjeta (borra también colores fx
+        // guardados barra a barra por la 1.0.0).
+        const card = (obj: string, fb: string, slices: any[]) => ({ uid: `${obj}_card`, displayName: T(`Obj_${obj}`, fb), groups: [{ uid: `${obj}_g`, displayName: "", slices }],
+            revertToDefaultDescriptors: slices.map(sl => sl.control.properties.descriptor) });
 
         return { cards: [
             card("style", "Style template", [
@@ -1546,6 +1612,12 @@ export class Visual implements IVisual {
                 col("smallMultiples", "background", "Panel background", s.smBackground),
                 tog("smallMultiples", "border", "Panel border", s.smBorder),
                 col("smallMultiples", "borderColor", "Panel border color", s.smBorderColor),
+            ]),
+            card("accessibility", "Accessibility", [
+                dd("accessibility", "highContrast", "High contrast", s.hcMode, [["auto", "Enum_hc_auto", "Automatic (Windows setting)"], ["on", "Enum_hc_on", "On"]]),
+                col("accessibility", "focusColor", "Focus color", s.focusColor),
+                num("accessibility", "focusWidth", "Focus width", s.focusWidth),
+                num("accessibility", "minTextSize", "Minimum text size", s.minText),
             ]),
             card("background", "Background", [
                 col("background", "color", "Color", s.background),
