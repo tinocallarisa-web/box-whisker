@@ -23,7 +23,7 @@ FIELD WELLS
 - Category | several fields | One box per value; with a hierarchy, drill down from the header.
 - Value | 1 | The measure whose spread is shown; its number format is used, dynamic format strings row by row.
 - Detail (rows) | 1 | The ID of each row: each row becomes one value in its box.
-- Group (Pro) | 1 | Boxes side by side inside each category, with a legend.
+- Group (Pro) | 1 | Boxes side by side inside each category, with a legend. More groups than the style has colours get a lighter or darker shade of the same palette, never a repeated colour.
 - Small multiples (Pro) | 1 | One panel per value, all on the same scale.
 - Tooltips | several | Extra measures in the tooltip, averaged over the rows of the box.
 
