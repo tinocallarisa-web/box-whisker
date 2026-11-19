@@ -9,6 +9,7 @@ Uso (las builds dejan el bundle en .tmp/drop; se copia a .tmp/sim_pro y .tmp/sim
     node build-test.js --free && (copiar .tmp/drop a .tmp/sim_free)
     node build-test.js        && (copiar .tmp/drop a .tmp/sim_pro)
     python tools/simulador/harness.py      → tools/simulador/capturas/*.png y un OK/FALLO por comprobación
+    python tools/simulador/harness.py ficha → solo las imágenes de la ficha (60_* a 62_*), para tools/gen_infographic.py
 """
 import asyncio, io, json, os, random, sys
 from playwright.async_api import async_playwright
@@ -96,10 +97,49 @@ async def page(browser, build, dv, W=900, H=520, view=0, sys_hc=False, license=F
     return pg
 
 
+INSPECCIONES = "C:/tcviz/test_visuales/BoxWhisker/inspecciones_calidad.csv"
+
+
+def dv_inspecciones(group=False, panel=False, objects=None):
+    """Datos de la ficha: Plant en Category, Inspection ID en Detail, Quality score (0.0) en Value; Shift y Year para Pro."""
+    import csv
+    filas = list(csv.DictReader(io.open(INSPECCIONES, encoding="utf-8")))
+    orden = {"Morning": 0, "Afternoon": 1, "Night": 2}
+    filas.sort(key=lambda r: (r["Plant"], r["Year"], orden[r["Shift"]], r["Inspection ID"]))
+    def col(nombre, q, rol, vals):
+        return {"source": {"displayName": nombre, "queryName": q, "roles": {rol: True}}, "values": vals}
+    cats = [col("Plant", "I.Plant", "category", [r["Plant"] for r in filas])]
+    if group: cats.append(col("Shift", "I.Shift", "group", [r["Shift"] for r in filas]))
+    if panel: cats.append(col("Year", "I.Year", "panel", [r["Year"] for r in filas]))
+    cats.append(col("Inspection ID", "I.Inspection ID", "detail", [r["Inspection ID"] for r in filas]))
+    v = {"source": {"displayName": "Quality score", "queryName": "Sum(I.Quality score)", "roles": {"value": True}, "isMeasure": True, "format": "0.0"},
+         "values": [float(r["Quality score"]) for r in filas]}
+    return {"metadata": {"columns": [c["source"] for c in cats] + [v["source"]], "objects": objects or {}},
+            "categorical": {"categories": cats, "values": [v]}}
+
+
+async def ficha(b):
+    """Imágenes de la ficha (1.0.1): build de prueba con Pro forzado (sin marca de agua), Report theme salvo la rejilla de estilos."""
+    async def shot(name, dv, W, H):
+        pg = await page(b, "sim_pro", dv, W, H, name=name)
+        await pg.close()
+    await shot("60_central", dv_inspecciones(), 852, 354)
+    await shot("60_free", dv_inspecciones(), 760, 500)
+    await shot("60_pro", dv_inspecciones(group=True, objects={"statistics": {"showMean": True}, "legend": {"show": True}}), 760, 500)
+    await shot("60_hero", dv_inspecciones(objects={"sort": {"by": "median", "descending": False}, "statistics": {"showMean": True},
+                                                      "reference": {"show": True, "value": 70, "label": "Target"}, "statsTable": {"show": True}}), 900, 600)
+    for k, (w, h) in {"l": (900, 520), "m": (520, 330), "s": (300, 170)}.items():
+        await shot("61_size_" + k, dv_inspecciones(), w, h)
+    for k in ("boardroom", "ledger", "editorial", "signal", "aurora", "terrace"):
+        await shot("62_style_" + k, dv_inspecciones(objects={"style": {"template": k}}), 760, 480)
+
+
 async def main():
     os.makedirs(OUT, exist_ok=True)
     async with async_playwright() as p:
         b = await p.chromium.launch()
+        if "ficha" in sys.argv:
+            await ficha(b); await b.close(); print(f"{len(FALLOS)} fallos"); return
         stats_on = {"statsTable": {"show": True}}
 
         print("F11 · formato dinámico")
